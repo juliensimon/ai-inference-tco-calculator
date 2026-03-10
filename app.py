@@ -43,9 +43,9 @@ MODEL_LIBRARY = {
     "Gemini 2.0 Flash-Lite": {"provider": "Google",    "input": 0.075, "output": 0.3,   "notes": "Cheapest Google model"},
     "DeepSeek V4":           {"provider": "DeepSeek",  "input": 0.3,   "output": 0.5,   "notes": "Latest DeepSeek, Mar 2026, 1M context"},
     "DeepSeek V3.2":         {"provider": "DeepSeek",  "input": 0.28,  "output": 0.42,  "notes": "Cost-effective API, strong coding/math"},
-    "Qwen3 Max":             {"provider": "Alibaba",   "input": 1.2,   "output": 6,     "notes": "Latest Qwen flagship, strong reasoning"},
+    "Qwen3 Max":             {"provider": "Alibaba",   "input": 1.2,   "output": 6,     "notes": "Latest Qwen flagship, 262K context. Via OpenRouter."},
     "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.07,  "output": 0.1,   "notes": "Open-weights 235B MoE (22B active). Via OpenRouter."},
-    "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.6,   "output": 3,     "notes": "Strong coding & math, 128K context"},
+    "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.45,  "output": 2.2,   "notes": "Strong coding & math, 262K context. Via OpenRouter."},
     "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter."},
     "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.15,  "output": 0.6,   "notes": "Open-weights 400B MoE (17B active). Via OpenRouter."},
     "Llama 4 Scout":         {"provider": "Meta",       "input": 0.08,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter."},
@@ -970,7 +970,7 @@ def build_app():
 
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
-                gr.Markdown("### Model Library — March 2026 Pricing\nSources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing", elem_classes="section-label")
+                gr.Markdown("### Model Library — March 2026 Pricing\nSources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing, openrouter.ai", elem_classes="section-label")
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     inp = f"${m['input']}" if m["input"] is not None else "N/A (self-hosted)"
