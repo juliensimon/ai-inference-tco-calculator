@@ -816,7 +816,7 @@ def build_app():
         gr.Markdown(
             '<div class="hero-banner">'
             '<h1>AI Infrastructure TCO Calculator</h1>'
-            '<p class="byline">By Julien Simon &nbsp;|&nbsp; AI Operating Partner, Fortino Capital &nbsp;|&nbsp; February 2026 Pricing</p>'
+            '<p class="byline">By Julien Simon &nbsp;|&nbsp; AI Operating Partner, Fortino Capital &nbsp;|&nbsp; March 2026 Pricing</p>'
             '<p class="tagline">Compare API costs, self-hosted GPU, and local/edge deployment for AI inference workloads.<br>'
             'Fill in your parameters below, then explore the analysis tabs.</p>'
             '</div>'
@@ -970,7 +970,7 @@ def build_app():
 
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
-                gr.Markdown("### Model Library — February 2026 Pricing\nSources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing", elem_classes="section-label")
+                gr.Markdown("### Model Library — March 2026 Pricing\nSources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing", elem_classes="section-label")
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     inp = f"${m['input']}" if m["input"] is not None else "N/A (self-hosted)"
