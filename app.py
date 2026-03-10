@@ -46,7 +46,7 @@ MODEL_LIBRARY = {
     "Qwen3 Max":             {"provider": "Alibaba",   "input": 1.2,   "output": 6,     "notes": "Latest Qwen flagship, strong reasoning"},
     "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.07,  "output": 0.1,   "notes": "Open-weights 235B MoE (22B active). Via OpenRouter."},
     "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.6,   "output": 3,     "notes": "Strong coding & math, 128K context"},
-    "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context, competitive Chinese model"},
+    "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter."},
     "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.15,  "output": 0.6,   "notes": "Open-weights 400B MoE (17B active). Via OpenRouter."},
     "Llama 4 Scout":         {"provider": "Meta",       "input": 0.08,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter."},
     "Arcee Trinity Large":   {"provider": "Arcee AI",   "input": 0,     "output": 0,     "notes": "Open-weights 400B MoE (13B active), 512K context. Preview, free on OpenRouter."},
