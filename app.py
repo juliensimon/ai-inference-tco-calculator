@@ -553,7 +553,7 @@ def master_update(
 
     # Break-even: at what daily request volume does self-hosted beat best API?
     # API cost scales linearly with volume; self-hosted is ~fixed (GPU rental)
-    api_cost_per_req = best_api["annual"] / (req_day * days_year) if req_day > 0 else 0
+    api_cost_per_req = best_api["total"] / (req_day * days_year) if req_day > 0 else 0
     if api_cost_per_req > 0:
         be_req_day = sh["total"] / (api_cost_per_req * days_year)
         if be_req_day <= req_day:
