@@ -15,6 +15,7 @@ import pandas as pd
 MODEL_LIBRARY = {
     "GPT-5.4 Pro":           {"provider": "OpenAI",    "input": 30,    "output": 180,   "notes": "Top-tier reasoning model, Mar 2026"},
     "GPT-5.4":               {"provider": "OpenAI",    "input": 2.5,   "output": 15,    "notes": "Latest flagship, Feb 2026"},
+    "GPT-5.2 Pro":           {"provider": "OpenAI",    "input": 21,    "output": 168,   "notes": "High-end reasoning variant, 400K context"},
     "GPT-5.2":               {"provider": "OpenAI",    "input": 1.75,  "output": 14,    "notes": "Previous flagship, Dec 2025"},
     "GPT-5.1":               {"provider": "OpenAI",    "input": 1.25,  "output": 10,    "notes": "Coding-optimized variant"},
     "GPT-5":                 {"provider": "OpenAI",    "input": 1.25,  "output": 10,    "notes": "Released Aug 2025, 400K context"},
@@ -42,6 +43,8 @@ MODEL_LIBRARY = {
     "Gemini 2.5 Flash-Lite": {"provider": "Google",    "input": 0.1,   "output": 0.4,   "notes": "Ultra-low-cost Google option"},
     "Gemini 3.1 Flash Lite": {"provider": "Google",    "input": 0.25,  "output": 1.5,   "notes": "Cost-efficient 3.1 variant, Mar 2026"},
     "Gemini 2.0 Flash-Lite": {"provider": "Google",    "input": 0.075, "output": 0.3,   "notes": "Cheapest Google model"},
+    "Grok 4":                {"provider": "xAI",       "input": 3,     "output": 15,    "notes": "256K context, Jul 2025"},
+    "Grok 4.1 Fast":         {"provider": "xAI",       "input": 0.2,   "output": 0.5,   "notes": "2M context, very competitive pricing"},
     "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, available on OpenRouter"},
     "DeepSeek V4":           {"provider": "DeepSeek",  "input": 0.3,   "output": 0.5,   "notes": "Latest DeepSeek, Mar 2026, 1M context"},
     "DeepSeek V3.2":         {"provider": "DeepSeek",  "input": 0.28,  "output": 0.42,  "notes": "Cost-effective API, strong coding/math"},
