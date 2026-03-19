@@ -979,6 +979,7 @@ def build_app():
                     gpu_cost_hr = gr.Number(
                         value=2.5, label="GPU cost / hour ($)",
                         info="H100: $1.49-$3.90, H200: $2.50-$4.31, B200: $3.75-$5.87")
+                with gr.Row():
                     num_gpus = gr.Number(
                         value=1, label="Number of instances",
                         info="7B model: 1 GPU. 70B model: 2-4 GPUs")
