@@ -63,6 +63,37 @@ MODEL_LIBRARY = {
 
 API_MODELS = [name for name, m in MODEL_LIBRARY.items() if m["input"] is not None]
 
+# ═════════════════════════════════════════════════════════════════════════════
+# GPU INSTANCE LIBRARY
+# ═════════════════════════════════════════════════════════════════════════════
+
+GPU_LIBRARY = {
+    # AWS
+    "H100 SXM (AWS p5.48xlarge)":    {"provider": "AWS",       "gpu": "H100",  "cost_hr": 8.25,  "vram_gb": 80,  "notes": "8-GPU node, ~$66/hr total"},
+    "H200 (AWS p5en.48xlarge)":      {"provider": "AWS",       "gpu": "H200",  "cost_hr": 5.20,  "vram_gb": 141, "notes": "8-GPU node, ~$41.6/hr total"},
+    "B200 (AWS p6.48xlarge)":        {"provider": "AWS",       "gpu": "B200",  "cost_hr": 14.24, "vram_gb": 192, "notes": "8-GPU node, ~$113.9/hr total"},
+    # GCP
+    "H100 (GCP a3-highgpu-8g)":     {"provider": "GCP",       "gpu": "H100",  "cost_hr": 11.06, "vram_gb": 80,  "notes": "8-GPU node"},
+    # Azure
+    "H100 (Azure ND H100 v5)":      {"provider": "Azure",     "gpu": "H100",  "cost_hr": 6.98,  "vram_gb": 80,  "notes": "8-GPU node"},
+    "H200 (Azure ND H200 v5)":      {"provider": "Azure",     "gpu": "H200",  "cost_hr": 10.60, "vram_gb": 141, "notes": "8-GPU node, ~$84.8/hr total"},
+    # Lambda Labs
+    "H100 SXM (Lambda)":            {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 2.99,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
+    "B200 SXM (Lambda)":            {"provider": "Lambda",    "gpu": "B200",  "cost_hr": 4.99,  "vram_gb": 192, "notes": "8-GPU node pricing"},
+    # CoreWeave
+    "H100 (CoreWeave)":             {"provider": "CoreWeave", "gpu": "H100",  "cost_hr": 4.76,  "vram_gb": 80,  "notes": "Single GPU on-demand"},
+    "H200 (CoreWeave)":             {"provider": "CoreWeave", "gpu": "H200",  "cost_hr": 6.30,  "vram_gb": 141, "notes": "8-GPU node, ~$50.4/hr total"},
+    "B200 (CoreWeave)":             {"provider": "CoreWeave", "gpu": "B200",  "cost_hr": 8.60,  "vram_gb": 192, "notes": "8-GPU node, ~$68.8/hr total"},
+    # RunPod
+    "H100 SXM (RunPod)":            {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 2.69,  "vram_gb": 80,  "notes": "Secure Cloud"},
+    "H200 SXM (RunPod)":            {"provider": "RunPod",    "gpu": "H200",  "cost_hr": 3.59,  "vram_gb": 141, "notes": "Secure Cloud"},
+    # Crusoe
+    "H100 (Crusoe)":                {"provider": "Crusoe",    "gpu": "H100",  "cost_hr": 3.90,  "vram_gb": 80,  "notes": "On-demand"},
+    "H200 (Crusoe)":                {"provider": "Crusoe",    "gpu": "H200",  "cost_hr": 4.29,  "vram_gb": 141, "notes": "On-demand"},
+}
+
+GPU_INSTANCES = list(GPU_LIBRARY.keys())
+
 
 # ═════════════════════════════════════════════════════════════════════════════
 # HELPERS
@@ -112,6 +143,13 @@ def get_model_prices(model_name):
         if m["input"] is not None:
             return float(m["input"]), float(m["output"])
     return 0.0, 0.0
+
+
+def get_gpu_price(instance_name):
+    """Return hourly cost from GPU library, or leave unchanged for Custom."""
+    if instance_name and instance_name in GPU_LIBRARY:
+        return float(GPU_LIBRARY[instance_name]["cost_hr"])
+    return gr.update()
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -892,6 +930,12 @@ def build_app():
                 gr.Markdown("---")
                 gr.Markdown("### Self-Hosted GPU Parameters\nCloud GPU rental with your own inference stack", elem_classes="section-label")
                 with gr.Row():
+                    gpu_instance = gr.Dropdown(
+                        choices=["(Custom)"] + GPU_INSTANCES,
+                        value="(Custom)",
+                        label="GPU instance preset",
+                        info="Select to auto-fill hourly cost, or use Custom"
+                    )
                     gpu_cost_hr = gr.Number(
                         value=2.5, label="GPU cost / hour ($)",
                         info="H100: $1.49-$3.90, H200: $2.50-$4.31, B200: $3.75-$5.87")
@@ -990,6 +1034,17 @@ def build_app():
                 )
                 gr.Dataframe(value=lib_df, label="Model Library", interactive=False)
 
+            # ─────────────────── Tab 7: GPU Library ─────────────────
+            with gr.Tab("GPU Library"):
+                gr.Markdown("### GPU Instance Pricing — March 2026\nPer-GPU on-demand hourly rates across major cloud providers", elem_classes="section-label")
+                gpu_df = pd.DataFrame([
+                    {"Instance": k, "Provider": v["provider"], "GPU": v["gpu"],
+                     "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}
+                    for k, v in GPU_LIBRARY.items()
+                ])
+                gr.Dataframe(value=gpu_df, label="GPU Instance Pricing (March 2026)", interactive=False)
+                gr.Markdown("*Sources: aws.amazon.com, cloud.google.com, azure.microsoft.com, lambda.ai, coreweave.com, runpod.io, crusoe.ai*")
+
         # ─────────────────── Event Wiring ─────────────────────────────
         all_inputs = [
             input_tpr, output_tpr, req_day, days_year,
@@ -1022,6 +1077,13 @@ def build_app():
             ).then(
                 fn=master_update, inputs=all_inputs, outputs=all_outputs,
             )
+
+        # GPU dropdown: auto-populate cost, then recalculate
+        gpu_instance.change(
+            fn=get_gpu_price, inputs=[gpu_instance], outputs=[gpu_cost_hr],
+        ).then(
+            fn=master_update, inputs=all_inputs, outputs=all_outputs,
+        )
 
         # All non-dropdown inputs trigger recalculation
         change_inputs = [
