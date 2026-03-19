@@ -1,5 +1,5 @@
 ---
-title: AI Infrastructure TCO Calculator
+title: AI Inference TCO Calculator
 emoji: 💰
 colorFrom: blue
 colorTo: indigo
@@ -9,13 +9,13 @@ app_file: app.py
 pinned: true
 ---
 
-# AI Infrastructure TCO Calculator
+# AI Inference TCO Calculator
 
 **By [Julien Simon](https://www.linkedin.com/in/juliensimon/) | AI Operating Partner, [Fortino Capital](https://fortinocapital.com)**
 
 > **[Try it live on Hugging Face Spaces](https://huggingface.co/spaces/juliensimon/tco-simulator)**
 
-Interactive calculator comparing Total Cost of Ownership for AI inference across three deployment options. Built for engineering leaders, CTOs, and AI strategists evaluating build-vs-buy decisions.
+How much does it *really* cost to run inference in production? This calculator compares the Total Cost of Ownership across three deployment options — API, self-hosted GPU, and local/edge — so you can make informed build-vs-buy decisions for your inference workloads.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Models-46-blue" alt="46 models">
@@ -24,21 +24,21 @@ Interactive calculator comparing Total Cost of Ownership for AI inference across
   <img src="https://img.shields.io/badge/Pricing-March%202026-red" alt="March 2026 pricing">
 </p>
 
-## Deployment Options Compared
+## Inference Deployment Options Compared
 
 | Option | Description | Best For |
 |--------|-------------|----------|
-| **API Providers** | Claude, GPT, Gemini, Grok, DeepSeek, and 40+ models | Low volume, fast iteration, no infra team |
-| **Self-Hosted GPU** | Cloud GPU rental (H100, H200, B200, L4, MI300X) with your own inference stack | High volume, data privacy, cost optimization |
-| **Local / Edge** | On-premises with consumer hardware (RTX 5090, etc.) | Small models, ultra-low latency, air-gapped |
+| **API Providers** | Pay-per-token inference via Claude, GPT, Gemini, Grok, DeepSeek, and 40+ models | Low volume, fast iteration, no infra team |
+| **Self-Hosted GPU** | Run your own inference stack (vLLM, TGI, etc.) on cloud GPUs | High volume, data privacy, cost optimization |
+| **Local / Edge** | On-premises inference with consumer hardware (RTX 5090, etc.) | Small models, ultra-low latency, air-gapped |
 
 ## Features
 
-- **46 API models** with current pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
-- **56 GPU instances** across 10 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai, FluidStack)
+- **46 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
+- **56 GPU instances** for self-hosted inference across 10 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai, FluidStack)
 - **8 GPU types**: L4, L40S, A100, H100, H200, B200, GB200, MI300X
-- **Smart routing** scenario (60/40 cheapest blend across providers)
-- **Break-even analysis** showing the daily request volume where self-hosted beats API
+- **Smart routing** scenario (60/40 cheapest blend across inference providers)
+- **Break-even analysis** showing the daily request volume where self-hosted inference beats API
 - **Real-time calculations** — all charts and tables update as you adjust parameters
 - **Interactive Plotly charts** with cost breakdowns and side-by-side comparisons
 
@@ -51,8 +51,8 @@ Visit the **[Hugging Face Space](https://huggingface.co/spaces/juliensimon/tco-s
 ### Run Locally
 
 ```bash
-git clone https://github.com/juliensimon/tco-simulator.git
-cd tco-simulator
+git clone https://github.com/juliensimon/ai-inference-tco-calculator.git
+cd ai-inference-tco-calculator
 pip install -r requirements.txt
 python app.py
 ```
