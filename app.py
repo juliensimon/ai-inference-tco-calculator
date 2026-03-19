@@ -136,6 +136,7 @@ GPU_LIBRARY = {
     "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.50,  "vram_gb": 48,  "notes": "Marketplace median"},
 }
 
+GPU_PROVIDERS = sorted(set(v["provider"] for v in GPU_LIBRARY.values()))
 GPU_INSTANCES = list(GPU_LIBRARY.keys())
 
 
@@ -187,6 +188,14 @@ def get_model_prices(model_name):
         if m["input"] is not None:
             return float(m["input"]), float(m["output"])
     return 0.0, 0.0
+
+
+def get_gpu_instances(provider):
+    """Return instance choices for a given provider."""
+    if not provider or provider == "(Custom)":
+        return gr.update(choices=["(Custom)"], value="(Custom)")
+    instances = [k for k, v in GPU_LIBRARY.items() if v["provider"] == provider]
+    return gr.update(choices=instances, value=instances[0] if instances else "(Custom)")
 
 
 def get_gpu_price(instance_name):
@@ -250,21 +259,17 @@ def calc_smart_routing(providers):
 
 
 def calc_self_hosted(gpu_cost_hr, num_gpus, hours_day, days_year, throughput,
-                     utilization, salary, pct_time, setup_cost,
-                     total_day, total_year_M):
+                     utilization, total_day, total_year_M):
     gpu = gpu_cost_hr * num_gpus * hours_day * days_year
-    eng = salary * pct_time / 100
-    setup_a = setup_cost / 3
     sw, net = 2000, 3000
-    total = gpu + eng + setup_a + sw + net
+    total = gpu + sw + net
     max_tok = throughput * num_gpus * 3600 * hours_day * utilization / 100
     headroom = ((max_tok - total_day) / total_day) if total_day > 0 else float("inf")
     return {
-        "gpu": gpu, "eng": eng, "setup_a": setup_a, "sw": sw, "net": net,
+        "gpu": gpu, "sw": sw, "net": net,
         "total": total, "monthly": total / 12,
         "max_tok": max_tok, "headroom": headroom,
         "cost_per_M": total / total_year_M if total_year_M > 0 else 0,
-        "setup_cost": setup_cost,
     }
 
 
@@ -398,7 +403,6 @@ def master_update(
     model_3, price_in_3, price_out_3,
     model_4_name, price_in_4, price_out_4,
     gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
-    ml_salary, ml_pct, setup_cost,
     hw_cost, num_dev, watts, elec_rate, hw_life,
     local_hours, local_throughput, it_support,
 ):
@@ -416,9 +420,6 @@ def master_update(
     gpu_util = sf(gpu_util, 70)
     gpu_hours = sf(gpu_hours, 24)
     gpu_throughput = sf(gpu_throughput, 2300)
-    ml_salary = sf(ml_salary, 180000)
-    ml_pct = sf(ml_pct, 25)
-    setup_cost_val = sf(setup_cost, 15000)
     hw_cost = sf(hw_cost, 1999)
     num_dev = sf(num_dev, 1)
     watts = sf(watts, 575)
@@ -507,24 +508,20 @@ def master_update(
     # ── Self-hosted GPU ──
     sh = calc_self_hosted(
         gpu_cost_hr, num_gpus, gpu_hours, days_year, gpu_throughput,
-        gpu_util, ml_salary, ml_pct, setup_cost_val,
-        u["total_day"], total_year_M,
+        gpu_util, u["total_day"], total_year_M,
     )
 
     sh_df = pd.DataFrame({
         "Cost Component": [
-            "GPU compute cost", "ML engineer cost (allocated)",
-            "Setup cost (amortized over 3 years)",
+            "GPU compute cost",
             "Software licenses (est.)", "Data transfer / networking (est.)",
         ],
         "Annual Cost ($)": [
-            fmt_c(sh["gpu"]), fmt_c(sh["eng"]), fmt_c(sh["setup_a"]),
+            fmt_c(sh["gpu"]),
             fmt_c(sh["sw"]), fmt_c(sh["net"]),
         ],
         "Notes": [
             "$/hr x GPUs x hrs/day x days/yr",
-            "Salary x % time on project",
-            "One-time cost / 3 years",
             "Inference framework, monitoring, etc.",
             "Egress, VPN, load balancing",
         ],
@@ -556,8 +553,8 @@ def master_update(
     )
 
     sh_fig = chart_donut(
-        ["GPU Compute", "ML Engineer", "Setup (amortized)", "Software", "Networking"],
-        [sh["gpu"], sh["eng"], sh["setup_a"], sh["sw"], sh["net"]],
+        ["GPU Compute", "Software", "Networking"],
+        [sh["gpu"], sh["sw"], sh["net"]],
         "Self-Hosted GPU — Cost Breakdown",
     )
 
@@ -680,17 +677,10 @@ def master_update(
     savings_pct = savings_val / highest_val if highest_val > 0 else 0
 
     # Break-even: self-hosted vs best API
-    sh_recurring = sh["gpu"] + sh["eng"] + sh["sw"] + sh["net"]  # excludes setup
-    sh_recurring_monthly = sh_recurring / 12
-    if sh_recurring_monthly >= best_api["monthly"]:
+    if sh["monthly"] >= best_api["monthly"]:
         breakeven = "API is cheaper"
     else:
-        monthly_saving = best_api["monthly"] - sh_recurring_monthly
-        if monthly_saving > 0:
-            be_months = setup_cost_val / monthly_saving
-            breakeven = f"{be_months:.1f} months"
-        else:
-            breakeven = "N/A"
+        breakeven = "Self-hosted is cheaper"
 
     comp_summary = (
         # Winner banner
@@ -974,17 +964,23 @@ def build_app():
                 gr.Markdown("---")
                 gr.Markdown("### Self-Hosted GPU Parameters\nCloud GPU rental with your own inference stack", elem_classes="section-label")
                 with gr.Row():
-                    gpu_instance = gr.Dropdown(
-                        choices=["(Custom)"] + GPU_INSTANCES,
+                    gpu_provider = gr.Dropdown(
+                        choices=["(Custom)"] + GPU_PROVIDERS,
                         value="(Custom)",
-                        label="GPU instance preset",
-                        info="Select to auto-fill hourly cost, or use Custom"
+                        label="GPU provider",
+                        info="Select provider, then pick instance"
+                    )
+                    gpu_instance = gr.Dropdown(
+                        choices=["(Custom)"],
+                        value="(Custom)",
+                        label="GPU instance",
+                        info="Auto-fills hourly cost"
                     )
                     gpu_cost_hr = gr.Number(
                         value=2.5, label="GPU cost / hour ($)",
                         info="H100: $1.49-$3.90, H200: $2.50-$4.31, B200: $3.75-$5.87")
                     num_gpus = gr.Number(
-                        value=1, label="Number of GPUs",
+                        value=1, label="Number of instances",
                         info="7B model: 1 GPU. 70B model: 2-4 GPUs")
                     gpu_util = gr.Slider(
                         minimum=0, maximum=100, value=70, step=5,
@@ -997,15 +993,6 @@ def build_app():
                     gpu_throughput = gr.Number(
                         value=2300, label="Throughput (tokens/sec/GPU)",
                         info="vLLM on H100: ~2300 for 8B model")
-                    ml_salary = gr.Number(
-                        value=180000, label="ML engineer salary (annual $)",
-                        info="Fully loaded cost")
-                    ml_pct = gr.Slider(
-                        minimum=0, maximum=100, value=25, step=5,
-                        label="ML engineer % time on project")
-                    setup_cost = gr.Number(
-                        value=15000, label="Setup & migration cost ($)",
-                        info="One-time: deployment, testing, optimization")
 
                 gr.Markdown("---")
                 gr.Markdown("### Local / Edge Parameters\nOn-premises or edge deployment with consumer hardware", elem_classes="section-label")
@@ -1097,7 +1084,6 @@ def build_app():
             model_3, price_in_3, price_out_3,
             model_4_name, price_in_4, price_out_4,
             gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
-            ml_salary, ml_pct, setup_cost,
             hw_cost, num_dev, watts, elec_rate, hw_life,
             local_hours, local_throughput, it_support,
         ]
@@ -1122,7 +1108,16 @@ def build_app():
                 fn=master_update, inputs=all_inputs, outputs=all_outputs,
             )
 
-        # GPU dropdown: auto-populate cost, then recalculate
+        # GPU provider → update instance list → update price → recalculate
+        gpu_provider.change(
+            fn=get_gpu_instances, inputs=[gpu_provider], outputs=[gpu_instance],
+        ).then(
+            fn=get_gpu_price, inputs=[gpu_instance], outputs=[gpu_cost_hr],
+        ).then(
+            fn=master_update, inputs=all_inputs, outputs=all_outputs,
+        )
+
+        # GPU instance dropdown: auto-populate cost, then recalculate
         gpu_instance.change(
             fn=get_gpu_price, inputs=[gpu_instance], outputs=[gpu_cost_hr],
         ).then(
@@ -1134,7 +1129,6 @@ def build_app():
             input_tpr, output_tpr, req_day, days_year,
             model_4_name, price_in_4, price_out_4,
             gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
-            ml_salary, ml_pct, setup_cost,
             hw_cost, num_dev, watts, elec_rate, hw_life,
             local_hours, local_throughput, it_support,
         ]
