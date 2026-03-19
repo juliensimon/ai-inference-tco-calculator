@@ -84,7 +84,7 @@ GPU_LIBRARY = {
     "Azure - MI300X - ND MI300X v5":        {"provider": "Azure",     "gpu": "MI300X", "cost_hr": 7.86, "vram_gb": 192, "notes": "8-GPU node, ~$62.85/hr total"},
     # ── CoreWeave ────────────────────────────────────────────────────────────
     "CoreWeave - A100 80GB":                {"provider": "CoreWeave", "gpu": "A100",  "cost_hr": 2.70,  "vram_gb": 80,  "notes": "8-GPU node, ~$21.60/hr total"},
-    "CoreWeave - B200":                     {"provider": "CoreWeave", "gpu": "B200",  "cost_hr": 8.60,  "vram_gb": 180, "notes": "8-GPU node, ~$68.80/hr total"},
+    "CoreWeave - B200":                     {"provider": "CoreWeave", "gpu": "B200",  "cost_hr": 8.60,  "vram_gb": 192, "notes": "8-GPU node, ~$68.80/hr total"},
     "CoreWeave - GB200 NVL72":              {"provider": "CoreWeave", "gpu": "GB200", "cost_hr": 10.50, "vram_gb": 186, "notes": "4-GPU node, ~$42.00/hr total"},
     "CoreWeave - H100 SXM":                 {"provider": "CoreWeave", "gpu": "H100",  "cost_hr": 6.16,  "vram_gb": 80,  "notes": "8-GPU node, ~$49.24/hr total"},
     "CoreWeave - H200":                     {"provider": "CoreWeave", "gpu": "H200",  "cost_hr": 6.31,  "vram_gb": 141, "notes": "8-GPU node, ~$50.44/hr total"},
@@ -110,13 +110,13 @@ GPU_LIBRARY = {
     # ── Lambda ───────────────────────────────────────────────────────────────
     "Lambda - A100 SXM 40GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 1.48,  "vram_gb": 40,  "notes": "1-GPU instance"},
     "Lambda - A100 SXM 80GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 2.06,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
-    "Lambda - B200 SXM":                    {"provider": "Lambda",    "gpu": "B200",  "cost_hr": 5.74,  "vram_gb": 180, "notes": "8-GPU node pricing"},
+    "Lambda - B200 SXM":                    {"provider": "Lambda",    "gpu": "B200",  "cost_hr": 5.74,  "vram_gb": 192, "notes": "8-GPU node pricing"},
     "Lambda - H100 PCIe":                   {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 2.86,  "vram_gb": 80,  "notes": "1-GPU instance"},
     "Lambda - H100 SXM":                    {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 3.44,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
     # ── RunPod ───────────────────────────────────────────────────────────────
     "RunPod - A100 PCIe 80GB":              {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.19,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - A100 SXM 80GB":               {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.39,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - B200":                        {"provider": "RunPod",    "gpu": "B200",  "cost_hr": 5.98,  "vram_gb": 180, "notes": "Secure Cloud on-demand"},
+    "RunPod - B200":                        {"provider": "RunPod",    "gpu": "B200",  "cost_hr": 5.98,  "vram_gb": 192, "notes": "Secure Cloud on-demand"},
     "RunPod - H100 PCIe":                   {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 1.99,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - H100 SXM":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 2.69,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - H200 SXM":                    {"provider": "RunPod",    "gpu": "H200",  "cost_hr": 3.59,  "vram_gb": 141, "notes": "Secure Cloud on-demand"},
@@ -124,7 +124,7 @@ GPU_LIBRARY = {
     "RunPod - L40S":                        {"provider": "RunPod",    "gpu": "L40S",  "cost_hr": 0.79,  "vram_gb": 48,  "notes": "Secure Cloud on-demand"},
     "RunPod - MI300X":                      {"provider": "RunPod",    "gpu": "MI300X", "cost_hr": 2.99, "vram_gb": 192, "notes": "Community Cloud on-demand"},
     # ── Together AI ──────────────────────────────────────────────────────────
-    "Together - B200":                      {"provider": "Together",  "gpu": "B200",  "cost_hr": 7.49,  "vram_gb": 180, "notes": "GPU cluster on-demand"},
+    "Together - B200":                      {"provider": "Together",  "gpu": "B200",  "cost_hr": 7.49,  "vram_gb": 192, "notes": "GPU cluster on-demand"},
     "Together - H100":                      {"provider": "Together",  "gpu": "H100",  "cost_hr": 3.49,  "vram_gb": 80,  "notes": "GPU cluster on-demand"},
     "Together - H200":                      {"provider": "Together",  "gpu": "H200",  "cost_hr": 4.19,  "vram_gb": 141, "notes": "GPU cluster on-demand"},
     # ── Vast.ai ──────────────────────────────────────────────────────────────
@@ -137,7 +137,6 @@ GPU_LIBRARY = {
 }
 
 GPU_PROVIDERS = sorted(set(v["provider"] for v in GPU_LIBRARY.values()))
-GPU_INSTANCES = list(GPU_LIBRARY.keys())
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -259,14 +258,13 @@ def calc_smart_routing(providers):
 
 
 def calc_self_hosted(gpu_cost_hr, num_gpus, hours_day, days_year, throughput,
-                     utilization, total_day, total_year_M):
+                     utilization, sw_cost, net_cost, total_day, total_year_M):
     gpu = gpu_cost_hr * num_gpus * hours_day * days_year
-    sw, net = 2000, 3000
-    total = gpu + sw + net
+    total = gpu + sw_cost + net_cost
     max_tok = throughput * num_gpus * 3600 * hours_day * utilization / 100
     headroom = ((max_tok - total_day) / total_day) if total_day > 0 else float("inf")
     return {
-        "gpu": gpu, "sw": sw, "net": net,
+        "gpu": gpu, "sw": sw_cost, "net": net_cost,
         "total": total, "monthly": total / 12,
         "max_tok": max_tok, "headroom": headroom,
         "cost_per_M": total / total_year_M if total_year_M > 0 else 0,
@@ -403,6 +401,7 @@ def master_update(
     model_3, price_in_3, price_out_3,
     model_4_name, price_in_4, price_out_4,
     gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
+    sh_sw_cost, sh_net_cost,
     hw_cost, num_dev, watts, elec_rate, hw_life,
     local_hours, local_throughput, it_support,
 ):
@@ -420,6 +419,8 @@ def master_update(
     gpu_util = sf(gpu_util, 70)
     gpu_hours = sf(gpu_hours, 24)
     gpu_throughput = sf(gpu_throughput, 2300)
+    sh_sw_cost = sf(sh_sw_cost, 2000)
+    sh_net_cost = sf(sh_net_cost, 3000)
     hw_cost = sf(hw_cost, 1999)
     num_dev = sf(num_dev, 1)
     watts = sf(watts, 575)
@@ -508,7 +509,7 @@ def master_update(
     # ── Self-hosted GPU ──
     sh = calc_self_hosted(
         gpu_cost_hr, num_gpus, gpu_hours, days_year, gpu_throughput,
-        gpu_util, u["total_day"], total_year_M,
+        gpu_util, sh_sw_cost, sh_net_cost, u["total_day"], total_year_M,
     )
 
     sh_df = pd.DataFrame({
@@ -676,11 +677,17 @@ def master_update(
     savings_val = highest_val - lowest_val
     savings_pct = savings_val / highest_val if highest_val > 0 else 0
 
-    # Break-even: self-hosted vs best API
-    if sh["monthly"] >= best_api["monthly"]:
-        breakeven = "API is cheaper"
+    # Break-even: at what daily request volume does self-hosted beat best API?
+    # API cost scales linearly with volume; self-hosted is ~fixed (GPU rental)
+    api_cost_per_req = best_api["annual"] / (req_day * days_year) if req_day > 0 else 0
+    if api_cost_per_req > 0:
+        be_req_day = sh["total"] / (api_cost_per_req * days_year)
+        if be_req_day <= req_day:
+            breakeven = f"{fmt_n(be_req_day)} req/day"
+        else:
+            breakeven = f"Need {fmt_n(be_req_day)} req/day"
     else:
-        breakeven = "Self-hosted is cheaper"
+        breakeven = "N/A"
 
     comp_summary = (
         # Winner banner
@@ -702,7 +709,7 @@ def master_update(
             _card("Annual Savings", fmt_c(savings_val), "success"),
             _card("Savings %", fmt_p(savings_pct), "success"),
             _card("Break-Even (Self-Hosted)", breakeven,
-                  "warning" if breakeven == "API is cheaper" else "default"),
+                  "warning" if "Need" in breakeven else "default"),
         )
     )
 
@@ -994,6 +1001,12 @@ def build_app():
                     gpu_throughput = gr.Number(
                         value=2300, label="Throughput (tokens/sec/GPU)",
                         info="vLLM on H100: ~2300 for 8B model")
+                    sh_sw_cost = gr.Number(
+                        value=2000, label="Software licenses (annual $)",
+                        info="Inference framework, monitoring, etc.")
+                    sh_net_cost = gr.Number(
+                        value=3000, label="Networking (annual $)",
+                        info="Egress, VPN, load balancing")
 
                 gr.Markdown("---")
                 gr.Markdown("### Local / Edge Parameters\nOn-premises or edge deployment with consumer hardware", elem_classes="section-label")
@@ -1085,6 +1098,7 @@ def build_app():
             model_3, price_in_3, price_out_3,
             model_4_name, price_in_4, price_out_4,
             gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
+            sh_sw_cost, sh_net_cost,
             hw_cost, num_dev, watts, elec_rate, hw_life,
             local_hours, local_throughput, it_support,
         ]
@@ -1130,6 +1144,7 @@ def build_app():
             input_tpr, output_tpr, req_day, days_year,
             model_4_name, price_in_4, price_out_4,
             gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
+            sh_sw_cost, sh_net_cost,
             hw_cost, num_dev, watts, elec_rate, hw_life,
             local_hours, local_throughput, it_support,
         ]
