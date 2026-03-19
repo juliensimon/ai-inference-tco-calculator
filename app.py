@@ -1,5 +1,5 @@
 """
-AI Infrastructure TCO Calculator
+AI Inference TCO Calculator
 By Julien Simon | AI Operating Partner, Fortino Capital
 Pricing as of March 2026
 """
@@ -8,135 +8,9 @@ import gradio as gr
 import plotly.graph_objects as go
 import pandas as pd
 
-# ═════════════════════════════════════════════════════════════════════════════
-# MODEL LIBRARY
-# ═════════════════════════════════════════════════════════════════════════════
+from models import MODEL_LIBRARY, API_MODELS
+from gpus import GPU_LIBRARY, GPU_PROVIDERS
 
-MODEL_LIBRARY = {
-    "GPT-5.4 Pro":           {"provider": "OpenAI",    "input": 30,    "output": 180,   "notes": "Top-tier reasoning model, Mar 2026"},
-    "GPT-5.4":               {"provider": "OpenAI",    "input": 2.5,   "output": 15,    "notes": "Latest flagship, Feb 2026"},
-    "GPT-5.2 Pro":           {"provider": "OpenAI",    "input": 21,    "output": 168,   "notes": "High-end reasoning variant, 400K context"},
-    "GPT-5.2":               {"provider": "OpenAI",    "input": 1.75,  "output": 14,    "notes": "Previous flagship, Dec 2025"},
-    "GPT-5.1":               {"provider": "OpenAI",    "input": 1.25,  "output": 10,    "notes": "Coding-optimized variant"},
-    "GPT-5":                 {"provider": "OpenAI",    "input": 1.25,  "output": 10,    "notes": "Released Aug 2025, 400K context"},
-    "GPT-5 Mini":            {"provider": "OpenAI",    "input": 0.25,  "output": 2,     "notes": "Efficient mid-tier, great value"},
-    "GPT-5 Nano":            {"provider": "OpenAI",    "input": 0.05,  "output": 0.4,   "notes": "Cheapest OpenAI option"},
-    "GPT-4.1":               {"provider": "OpenAI",    "input": 2,     "output": 8,     "notes": "Strong all-rounder, 1M context"},
-    "GPT-4.1 Mini":          {"provider": "OpenAI",    "input": 0.4,   "output": 1.6,   "notes": "Efficient mid-tier, 1M context"},
-    "GPT-4.1 Nano":          {"provider": "OpenAI",    "input": 0.1,   "output": 0.4,   "notes": "Fastest & cheapest GPT-4.1"},
-    "o3":                    {"provider": "OpenAI",    "input": 2,     "output": 8,     "notes": "Reasoning model, price dropped Mar 2026"},
-    "o4-mini":               {"provider": "OpenAI",    "input": 1.1,   "output": 4.4,   "notes": "Affordable reasoning model"},
-    "o1":                    {"provider": "OpenAI",    "input": 15,    "output": 60,    "notes": "Legacy reasoning, high-cost"},
-    "Claude Opus 4.6":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Most capable Anthropic model"},
-    "Claude Sonnet 4.6":     {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Opus-level performance at Sonnet pricing, 1M context"},
-    "Claude Haiku 4.5":      {"provider": "Anthropic", "input": 1,     "output": 5,     "notes": "Fast & efficient, great for routing"},
-    "Claude Opus 4.5":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous flagship, same pricing as 4.6"},
-    "Claude Sonnet 4.5":     {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Previous Sonnet, same pricing as 4.6"},
-    "Claude Sonnet 4":       {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Previous generation Sonnet"},
-    "Claude Haiku 3.5":      {"provider": "Anthropic", "input": 0.8,   "output": 4,     "notes": "Legacy efficient model"},
-    "Claude Haiku 3":        {"provider": "Anthropic", "input": 0.25,  "output": 1.25,  "notes": "Cheapest Anthropic option"},
-    "Gemini 3.1 Pro":        {"provider": "Google",    "input": 2,     "output": 12,    "notes": "Latest Google flagship, Mar 2026"},
-    "Gemini 3 Pro":          {"provider": "Google",    "input": 2,     "output": 12,    "notes": "Previous flagship"},
-    "Gemini 3 Flash":        {"provider": "Google",    "input": 0.5,   "output": 3,     "notes": "Pro-grade reasoning at Flash speed"},
-    "Gemini 2.5 Pro":        {"provider": "Google",    "input": 1.25,  "output": 10,    "notes": "Production-ready, 1M context"},
-    "Gemini 2.5 Flash":      {"provider": "Google",    "input": 0.15,  "output": 0.6,   "notes": "Best budget option, very capable"},
-    "Gemini 2.5 Flash-Lite": {"provider": "Google",    "input": 0.1,   "output": 0.4,   "notes": "Ultra-low-cost Google option"},
-    "Gemini 3.1 Flash Lite": {"provider": "Google",    "input": 0.25,  "output": 1.5,   "notes": "Cost-efficient 3.1 variant, Mar 2026"},
-    "Gemini 2.0 Flash-Lite": {"provider": "Google",    "input": 0.075, "output": 0.3,   "notes": "Cheapest Google model"},
-    "Grok 4":                {"provider": "xAI",       "input": 3,     "output": 15,    "notes": "256K context, Jul 2025"},
-    "Grok 4.1 Fast":         {"provider": "xAI",       "input": 0.2,   "output": 0.5,   "notes": "2M context, very competitive pricing"},
-    "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, available on OpenRouter"},
-    "DeepSeek V4":           {"provider": "DeepSeek",  "input": 0.3,   "output": 0.5,   "notes": "Latest DeepSeek, Mar 2026, 1M context"},
-    "DeepSeek V3.2":         {"provider": "DeepSeek",  "input": 0.28,  "output": 0.42,  "notes": "Cost-effective API, strong coding/math"},
-    "Qwen3 Max":             {"provider": "Alibaba",   "input": 1.2,   "output": 6,     "notes": "Latest Qwen flagship, 262K context. Via OpenRouter."},
-    "Qwen3.5 Plus":          {"provider": "Alibaba",   "input": 0.26,  "output": 1.56,  "notes": "Latest Qwen mid-tier. Via OpenRouter."},
-    "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.07,  "output": 0.1,   "notes": "Open-weights 235B MoE (22B active). Via OpenRouter."},
-    "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.45,  "output": 2.2,   "notes": "Strong coding & math, 262K context. Via OpenRouter."},
-    "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.27,  "output": 0.95,  "notes": "Latest MiniMax flagship. Via OpenRouter."},
-    "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter."},
-    "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.15,  "output": 0.6,   "notes": "Open-weights 400B MoE (17B active). Via OpenRouter."},
-    "Llama 4 Scout":         {"provider": "Meta",       "input": 0.08,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter."},
-    "Arcee Trinity Large":   {"provider": "Arcee AI",   "input": 0,     "output": 0,     "notes": "Open-weights 400B MoE (13B active), 512K context. Preview, free on OpenRouter."},
-    "Arcee Trinity Mini":    {"provider": "Arcee AI",   "input": 0.045, "output": 0.15,  "notes": "Open-weights 26B MoE (3B active), 128K context. Via OpenRouter."},
-    "Arcee Trinity Nano":    {"provider": "Arcee AI",   "input": None,  "output": None,  "notes": "Open-weights 6B MoE (1B active), 128K context. Self-hosted only."},
-}
-
-API_MODELS = [name for name, m in MODEL_LIBRARY.items() if m["input"] is not None]
-
-# ═════════════════════════════════════════════════════════════════════════════
-# GPU INSTANCE LIBRARY
-# ═════════════════════════════════════════════════════════════════════════════
-
-GPU_LIBRARY = {
-    # ── AWS ──────────────────────────────────────────────────────────────────
-    "AWS - A100 40GB - p4d.24xlarge":       {"provider": "AWS",       "gpu": "A100",  "cost_hr": 2.75,  "vram_gb": 40,  "notes": "8-GPU node, ~$21.96/hr total"},
-    "AWS - B200 - p6-b200.48xlarge":        {"provider": "AWS",       "gpu": "B200",  "cost_hr": 14.24, "vram_gb": 192, "notes": "8-GPU node, ~$113.93/hr total"},
-    "AWS - H100 SXM - p5.48xlarge":         {"provider": "AWS",       "gpu": "H100",  "cost_hr": 6.88,  "vram_gb": 80,  "notes": "8-GPU node, ~$55.04/hr total"},
-    "AWS - H200 - p5en.48xlarge":           {"provider": "AWS",       "gpu": "H200",  "cost_hr": 7.91,  "vram_gb": 141, "notes": "8-GPU node, ~$63.30/hr total"},
-    "AWS - L4 - g6.xlarge":                 {"provider": "AWS",       "gpu": "L4",    "cost_hr": 0.81,  "vram_gb": 24,  "notes": "1-GPU instance"},
-    "AWS - L4 - g6.12xlarge":               {"provider": "AWS",       "gpu": "L4",    "cost_hr": 1.15,  "vram_gb": 24,  "notes": "4-GPU node, ~$4.60/hr total"},
-    "AWS - L40S - g6e.xlarge":              {"provider": "AWS",       "gpu": "L40S",  "cost_hr": 1.86,  "vram_gb": 48,  "notes": "1-GPU instance"},
-    "AWS - L40S - g6e.12xlarge":            {"provider": "AWS",       "gpu": "L40S",  "cost_hr": 2.62,  "vram_gb": 48,  "notes": "4-GPU node, ~$10.49/hr total"},
-    # ── Azure ────────────────────────────────────────────────────────────────
-    "Azure - A100 80GB - NC A100 v4":       {"provider": "Azure",     "gpu": "A100",  "cost_hr": 3.67,  "vram_gb": 80,  "notes": "1-GPU instance"},
-    "Azure - H100 - ND H100 v5":            {"provider": "Azure",     "gpu": "H100",  "cost_hr": 12.29, "vram_gb": 80,  "notes": "8-GPU node, ~$98.32/hr total"},
-    "Azure - H200 - ND H200 v5":            {"provider": "Azure",     "gpu": "H200",  "cost_hr": 13.78, "vram_gb": 141, "notes": "8-GPU node, ~$110.24/hr total"},
-    "Azure - MI300X - ND MI300X v5":        {"provider": "Azure",     "gpu": "MI300X", "cost_hr": 7.86, "vram_gb": 192, "notes": "8-GPU node, ~$62.85/hr total"},
-    # ── CoreWeave ────────────────────────────────────────────────────────────
-    "CoreWeave - A100 80GB":                {"provider": "CoreWeave", "gpu": "A100",  "cost_hr": 2.70,  "vram_gb": 80,  "notes": "8-GPU node, ~$21.60/hr total"},
-    "CoreWeave - B200":                     {"provider": "CoreWeave", "gpu": "B200",  "cost_hr": 8.60,  "vram_gb": 192, "notes": "8-GPU node, ~$68.80/hr total"},
-    "CoreWeave - GB200 NVL72":              {"provider": "CoreWeave", "gpu": "GB200", "cost_hr": 10.50, "vram_gb": 186, "notes": "4-GPU node, ~$42.00/hr total"},
-    "CoreWeave - H100 SXM":                 {"provider": "CoreWeave", "gpu": "H100",  "cost_hr": 6.16,  "vram_gb": 80,  "notes": "8-GPU node, ~$49.24/hr total"},
-    "CoreWeave - H200":                     {"provider": "CoreWeave", "gpu": "H200",  "cost_hr": 6.31,  "vram_gb": 141, "notes": "8-GPU node, ~$50.44/hr total"},
-    "CoreWeave - L40S":                     {"provider": "CoreWeave", "gpu": "L40S",  "cost_hr": 2.25,  "vram_gb": 48,  "notes": "8-GPU node, ~$18.00/hr total"},
-    # ── Crusoe ───────────────────────────────────────────────────────────────
-    "Crusoe - A100 PCIe 40GB":              {"provider": "Crusoe",    "gpu": "A100",  "cost_hr": 1.45,  "vram_gb": 40,  "notes": "On-demand"},
-    "Crusoe - A100 SXM 80GB":              {"provider": "Crusoe",    "gpu": "A100",  "cost_hr": 1.95,  "vram_gb": 80,  "notes": "On-demand"},
-    "Crusoe - H100 HGX":                    {"provider": "Crusoe",    "gpu": "H100",  "cost_hr": 3.90,  "vram_gb": 80,  "notes": "On-demand"},
-    "Crusoe - H200 HGX":                    {"provider": "Crusoe",    "gpu": "H200",  "cost_hr": 4.29,  "vram_gb": 141, "notes": "On-demand"},
-    "Crusoe - L40S":                        {"provider": "Crusoe",    "gpu": "L40S",  "cost_hr": 1.00,  "vram_gb": 48,  "notes": "On-demand"},
-    "Crusoe - MI300X":                      {"provider": "Crusoe",    "gpu": "MI300X", "cost_hr": 3.45, "vram_gb": 192, "notes": "On-demand"},
-    # ── FluidStack ───────────────────────────────────────────────────────────
-    "FluidStack - A100 SXM 80GB":           {"provider": "FluidStack", "gpu": "A100", "cost_hr": 1.30,  "vram_gb": 80,  "notes": "On-demand"},
-    "FluidStack - H100 SXM":                {"provider": "FluidStack", "gpu": "H100", "cost_hr": 2.10,  "vram_gb": 80,  "notes": "On-demand"},
-    "FluidStack - H200":                    {"provider": "FluidStack", "gpu": "H200", "cost_hr": 2.30,  "vram_gb": 141, "notes": "On-demand"},
-    "FluidStack - L40S":                    {"provider": "FluidStack", "gpu": "L40S", "cost_hr": 1.30,  "vram_gb": 48,  "notes": "On-demand"},
-    # ── GCP ──────────────────────────────────────────────────────────────────
-    "GCP - A100 40GB - a2-highgpu-1g":      {"provider": "GCP",       "gpu": "A100",  "cost_hr": 3.67,  "vram_gb": 40,  "notes": "1-GPU instance"},
-    "GCP - H100 SXM - a3-highgpu-8g":       {"provider": "GCP",       "gpu": "H100",  "cost_hr": 10.98, "vram_gb": 80,  "notes": "8-GPU node, ~$87.83/hr total"},
-    "GCP - H200 - a3-ultragpu-8g":          {"provider": "GCP",       "gpu": "H200",  "cost_hr": 10.85, "vram_gb": 141, "notes": "8-GPU node, ~$86.76/hr total"},
-    "GCP - L4 - g2-standard-4":             {"provider": "GCP",       "gpu": "L4",    "cost_hr": 0.71,  "vram_gb": 24,  "notes": "1-GPU instance"},
-    "GCP - L4 - g2-standard-48":            {"provider": "GCP",       "gpu": "L4",    "cost_hr": 1.00,  "vram_gb": 24,  "notes": "4-GPU node, ~$4.00/hr total"},
-    # ── Lambda ───────────────────────────────────────────────────────────────
-    "Lambda - A100 SXM 40GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 1.48,  "vram_gb": 40,  "notes": "1-GPU instance"},
-    "Lambda - A100 SXM 80GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 2.06,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
-    "Lambda - B200 SXM":                    {"provider": "Lambda",    "gpu": "B200",  "cost_hr": 5.74,  "vram_gb": 192, "notes": "8-GPU node pricing"},
-    "Lambda - H100 PCIe":                   {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 2.86,  "vram_gb": 80,  "notes": "1-GPU instance"},
-    "Lambda - H100 SXM":                    {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 3.44,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
-    # ── RunPod ───────────────────────────────────────────────────────────────
-    "RunPod - A100 PCIe 80GB":              {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.19,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - A100 SXM 80GB":               {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.39,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - B200":                        {"provider": "RunPod",    "gpu": "B200",  "cost_hr": 5.98,  "vram_gb": 192, "notes": "Secure Cloud on-demand"},
-    "RunPod - H100 PCIe":                   {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 1.99,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - H100 SXM":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 2.69,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - H200 SXM":                    {"provider": "RunPod",    "gpu": "H200",  "cost_hr": 3.59,  "vram_gb": 141, "notes": "Secure Cloud on-demand"},
-    "RunPod - L4":                          {"provider": "RunPod",    "gpu": "L4",    "cost_hr": 0.39,  "vram_gb": 24,  "notes": "Secure Cloud on-demand"},
-    "RunPod - L40S":                        {"provider": "RunPod",    "gpu": "L40S",  "cost_hr": 0.79,  "vram_gb": 48,  "notes": "Secure Cloud on-demand"},
-    "RunPod - MI300X":                      {"provider": "RunPod",    "gpu": "MI300X", "cost_hr": 2.99, "vram_gb": 192, "notes": "Community Cloud on-demand"},
-    # ── Together AI ──────────────────────────────────────────────────────────
-    "Together - B200":                      {"provider": "Together",  "gpu": "B200",  "cost_hr": 7.49,  "vram_gb": 192, "notes": "GPU cluster on-demand"},
-    "Together - H100":                      {"provider": "Together",  "gpu": "H100",  "cost_hr": 3.49,  "vram_gb": 80,  "notes": "GPU cluster on-demand"},
-    "Together - H200":                      {"provider": "Together",  "gpu": "H200",  "cost_hr": 4.19,  "vram_gb": 141, "notes": "GPU cluster on-demand"},
-    # ── Vast.ai ──────────────────────────────────────────────────────────────
-    "Vast.ai - A100 SXM 80GB":             {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 0.77,  "vram_gb": 80,  "notes": "Marketplace median"},
-    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 2.67,  "vram_gb": 192, "notes": "Marketplace pricing"},
-    "Vast.ai - H100 SXM":                  {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 1.91,  "vram_gb": 80,  "notes": "Marketplace median"},
-    "Vast.ai - H200":                      {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 2.52,  "vram_gb": 141, "notes": "Marketplace median"},
-    "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.34,  "vram_gb": 24,  "notes": "Marketplace median"},
-    "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.50,  "vram_gb": 48,  "notes": "Marketplace median"},
-}
-
-GPU_PROVIDERS = sorted(set(v["provider"] for v in GPU_LIBRARY.values()))
 
 
 # ═════════════════════════════════════════════════════════════════════════════
