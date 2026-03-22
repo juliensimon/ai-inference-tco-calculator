@@ -955,7 +955,7 @@ def build_app():
 
             # ─────────────────── Tab 7: GPU Library ─────────────────
             with gr.Tab("GPU Library"):
-                gr.Markdown("### GPU Instance Pricing — March 22, 2026\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** [AWS](https://aws.amazon.com/ec2/pricing/on-demand/) us-east-1, [GCP](https://cloud.google.com/compute/gpus-pricing) us-central1, [Azure](https://azure.microsoft.com/en-us/pricing/details/virtual-machines/) East US, [CoreWeave](https://www.coreweave.com/pricing) US-East, [Crusoe](https://www.crusoe.ai/cloud/pricing) us-north1, [FluidStack](https://www.fluidstack.io/pricing) US, [Lambda](https://lambda.ai/pricing) US, [RunPod](https://www.runpod.io/gpu-pricing) US, [Together](https://www.together.ai/pricing) US, [Vast.ai](https://vast.ai) US (marketplace)", elem_classes="section-label")
+                gr.Markdown("### GPU Instance Library — March 22, 2026 Pricing\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** AWS us-east-1, GCP us-central1, Azure East US, CoreWeave US-East, Crusoe us-north1, FluidStack US, Lambda US, RunPod US, Together US, Vast.ai US (marketplace)", elem_classes="section-label")
                 gpu_df = pd.DataFrame([
                     {"Instance": k, "Provider": v["provider"], "GPU": v["gpu"],
                      "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}
