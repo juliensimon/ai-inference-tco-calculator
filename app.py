@@ -1,7 +1,7 @@
 """
 AI Inference TCO Calculator
 By Julien Simon | AI Operating Partner, Fortino Capital
-Pricing as of March 2026
+Pricing as of March 22, 2026
 """
 
 import gradio as gr
@@ -776,7 +776,7 @@ def build_app():
         gr.Markdown(
             '<div class="hero-banner">'
             '<h1>AI Infrastructure TCO Calculator</h1>'
-            '<p class="byline">By Julien Simon &nbsp;|&nbsp; AI Operating Partner, Fortino Capital &nbsp;|&nbsp; March 2026 Pricing</p>'
+            '<p class="byline">By Julien Simon &nbsp;|&nbsp; AI Operating Partner, Fortino Capital &nbsp;|&nbsp; March 22, 2026 Pricing</p>'
             '<p class="tagline">Compare API costs, self-hosted GPU, and local/edge deployment for AI inference workloads.<br>'
             'Fill in your parameters below, then explore the analysis tabs.</p>'
             '</div>'
@@ -940,7 +940,7 @@ def build_app():
 
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
-                gr.Markdown("### Model Library — March 2026 Pricing\nSources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing, openrouter.ai", elem_classes="section-label")
+                gr.Markdown("### Model Library — March 22, 2026 Pricing\nSources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing, openrouter.ai", elem_classes="section-label")
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     inp = f"${m['input']}" if m["input"] is not None else "N/A (self-hosted)"
@@ -955,13 +955,13 @@ def build_app():
 
             # ─────────────────── Tab 7: GPU Library ─────────────────
             with gr.Tab("GPU Library"):
-                gr.Markdown("### GPU Instance Pricing — March 2026\nPer-GPU on-demand hourly rates across major cloud providers", elem_classes="section-label")
+                gr.Markdown("### GPU Instance Pricing — March 22, 2026\nPer-GPU on-demand hourly rates across major cloud providers", elem_classes="section-label")
                 gpu_df = pd.DataFrame([
                     {"Instance": k, "Provider": v["provider"], "GPU": v["gpu"],
                      "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}
                     for k, v in GPU_LIBRARY.items()
                 ])
-                gr.Dataframe(value=gpu_df, label="GPU Instance Pricing (March 2026)", interactive=False)
+                gr.Dataframe(value=gpu_df, label="GPU Instance Pricing (March 22, 2026)", interactive=False)
                 gr.Markdown("*Sources: aws.amazon.com, cloud.google.com, azure.microsoft.com, coreweave.com, crusoe.ai, fluidstack.io, lambda.ai, runpod.io, together.ai, vast.ai*")
 
         # ─────────────────── Event Wiring ─────────────────────────────

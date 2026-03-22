@@ -21,7 +21,7 @@ How much does it *really* cost to run inference in production? This calculator c
   <img src="https://img.shields.io/badge/Models-46-blue" alt="46 models">
   <img src="https://img.shields.io/badge/GPU%20Instances-56-green" alt="56 GPU instances">
   <img src="https://img.shields.io/badge/GPU%20Providers-10-orange" alt="10 providers">
-  <img src="https://img.shields.io/badge/Pricing-March%202026-red" alt="March 2026 pricing">
+  <img src="https://img.shields.io/badge/Pricing-March%2022%2C%202026-red" alt="March 22, 2026 pricing">
 </p>
 
 ## Inference Deployment Options Compared
@@ -94,7 +94,7 @@ openai.com, docs.anthropic.com, ai.google.dev, openrouter.ai
 ### GPU Instance Pricing
 aws.amazon.com, cloud.google.com, azure.microsoft.com, coreweave.com, crusoe.ai, fluidstack.io, lambda.ai, runpod.io, together.ai, vast.ai
 
-All pricing as of March 2026. Contributions welcome to keep pricing current.
+All pricing as of March 22, 2026. Contributions welcome to keep pricing current.
 
 ## Contributing
 
