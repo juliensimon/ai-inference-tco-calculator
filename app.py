@@ -955,7 +955,7 @@ def build_app():
 
             # ─────────────────── Tab 7: GPU Library ─────────────────
             with gr.Tab("GPU Library"):
-                gr.Markdown("### GPU Instance Pricing — March 22, 2026\nPer-GPU on-demand hourly rates across major cloud providers", elem_classes="section-label")
+                gr.Markdown("### GPU Instance Pricing — March 22, 2026\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** AWS us-east-1, GCP us-central1, Azure East US, CoreWeave US-East, Crusoe us-north1, FluidStack US, Lambda US, RunPod US, Together US, Vast.ai US (marketplace)", elem_classes="section-label")
                 gpu_df = pd.DataFrame([
                     {"Instance": k, "Provider": v["provider"], "GPU": v["gpu"],
                      "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}

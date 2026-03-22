@@ -47,3 +47,4 @@ Last updated: March 22, 2026
 - For multi-GPU nodes, per-GPU price = total node price / number of GPUs
 - Vast.ai prices are marketplace medians and fluctuate
 - All prices are on-demand unless noted otherwise
+- **Regions used:** AWS us-east-1, GCP us-central1, Azure East US, CoreWeave US-East, Crusoe us-north1, FluidStack US, Lambda US, RunPod US, Together US, Vast.ai US (marketplace)
