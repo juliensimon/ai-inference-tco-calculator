@@ -1,6 +1,6 @@
 """
 GPU Instance Library — per-GPU on-demand hourly pricing for inference
-Pricing as of March 2026
+Pricing as of March 22, 2026
 
 Sources: aws.amazon.com, cloud.google.com, azure.microsoft.com,
          coreweave.com, crusoe.ai, fluidstack.io, lambda.ai,
@@ -32,6 +32,7 @@ GPU_LIBRARY = {
     # ── Crusoe ───────────────────────────────────────────────────────────────
     "Crusoe - A100 PCIe 40GB":              {"provider": "Crusoe",    "gpu": "A100",  "cost_hr": 1.45,  "vram_gb": 40,  "notes": "On-demand"},
     "Crusoe - A100 SXM 80GB":              {"provider": "Crusoe",    "gpu": "A100",  "cost_hr": 1.95,  "vram_gb": 80,  "notes": "On-demand"},
+    "Crusoe - A100 PCIe 80GB":              {"provider": "Crusoe",    "gpu": "A100",  "cost_hr": 1.65,  "vram_gb": 80,  "notes": "On-demand"},
     "Crusoe - H100 HGX":                    {"provider": "Crusoe",    "gpu": "H100",  "cost_hr": 3.90,  "vram_gb": 80,  "notes": "On-demand"},
     "Crusoe - H200 HGX":                    {"provider": "Crusoe",    "gpu": "H200",  "cost_hr": 4.29,  "vram_gb": 141, "notes": "On-demand"},
     "Crusoe - L40S":                        {"provider": "Crusoe",    "gpu": "L40S",  "cost_hr": 1.00,  "vram_gb": 48,  "notes": "On-demand"},
@@ -48,11 +49,12 @@ GPU_LIBRARY = {
     "GCP - L4 - g2-standard-4":             {"provider": "GCP",       "gpu": "L4",    "cost_hr": 0.71,  "vram_gb": 24,  "notes": "1-GPU instance"},
     "GCP - L4 - g2-standard-48":            {"provider": "GCP",       "gpu": "L4",    "cost_hr": 1.00,  "vram_gb": 24,  "notes": "4-GPU node, ~$4.00/hr total"},
     # ── Lambda ───────────────────────────────────────────────────────────────
-    "Lambda - A100 SXM 40GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 1.48,  "vram_gb": 40,  "notes": "1-GPU instance"},
-    "Lambda - A100 SXM 80GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 2.06,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
-    "Lambda - B200 SXM":                    {"provider": "Lambda",    "gpu": "B200",  "cost_hr": 5.74,  "vram_gb": 192, "notes": "8-GPU node pricing"},
-    "Lambda - H100 PCIe":                   {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 2.86,  "vram_gb": 80,  "notes": "1-GPU instance"},
-    "Lambda - H100 SXM":                    {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 3.44,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
+    "Lambda - A100 SXM 40GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 1.29,  "vram_gb": 40,  "notes": "1-GPU instance"},
+    "Lambda - A100 SXM 80GB":               {"provider": "Lambda",    "gpu": "A100",  "cost_hr": 1.79,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
+    "Lambda - B200 SXM":                    {"provider": "Lambda",    "gpu": "B200",  "cost_hr": 4.99,  "vram_gb": 192, "notes": "8-GPU node pricing"},
+    "Lambda - H100 PCIe":                   {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 2.49,  "vram_gb": 80,  "notes": "1-GPU instance"},
+    "Lambda - H100 SXM":                    {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 2.99,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
+    "Lambda - H200":                        {"provider": "Lambda",    "gpu": "H200",  "cost_hr": 4.49,  "vram_gb": 141, "notes": "On-demand"},
     # ── RunPod ───────────────────────────────────────────────────────────────
     "RunPod - A100 PCIe 80GB":              {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.19,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - A100 SXM 80GB":               {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.39,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
@@ -70,8 +72,8 @@ GPU_LIBRARY = {
     # ── Vast.ai ──────────────────────────────────────────────────────────────
     "Vast.ai - A100 SXM 80GB":             {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 0.77,  "vram_gb": 80,  "notes": "Marketplace median"},
     "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 2.67,  "vram_gb": 192, "notes": "Marketplace pricing"},
-    "Vast.ai - H100 SXM":                  {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 1.91,  "vram_gb": 80,  "notes": "Marketplace median"},
-    "Vast.ai - H200":                      {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 2.52,  "vram_gb": 141, "notes": "Marketplace median"},
+    "Vast.ai - H100 SXM":                  {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 1.50,  "vram_gb": 80,  "notes": "Marketplace median"},
+    "Vast.ai - H200":                      {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 2.20,  "vram_gb": 141, "notes": "Marketplace median"},
     "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.34,  "vram_gb": 24,  "notes": "Marketplace median"},
     "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.50,  "vram_gb": 48,  "notes": "Marketplace median"},
 }

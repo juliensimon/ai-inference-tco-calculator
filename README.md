@@ -34,8 +34,8 @@ How much does it *really* cost to run inference in production? This calculator c
 
 ## Features
 
-- **46 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
-- **56 GPU instances** for self-hosted inference across 10 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai, FluidStack)
+- **52 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
+- **58 GPU instances** for self-hosted inference across 10 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai, FluidStack)
 - **8 GPU types**: L4, L40S, A100, H100, H200, B200, GB200, MI300X (NVIDIA + AMD)
 - **Smart routing** scenario (60/40 cheapest blend across inference providers)
 - **Break-even analysis** showing the daily request volume where self-hosted inference beats API
@@ -71,16 +71,16 @@ pytest test_app.py -v
 3. **Self-Hosted GPU** — Pick a cloud provider and GPU instance from the dropdowns, or enter custom pricing
 4. **Local / Edge** — Configure on-premises hardware parameters
 5. **Comparison** — View side-by-side annual costs, per-million-token costs, and break-even analysis
-6. **Model Library** — Browse all 46 models with current pricing
-7. **GPU Library** — Browse all 56 GPU instances with per-hour pricing across providers
+6. **Model Library** — Browse all 52 models with current pricing
+7. **GPU Library** — Browse all 58 GPU instances with per-hour pricing across providers
 
 ## Project Structure
 
 | File | Description |
 |------|-------------|
 | `app.py` | UI, calculations, charts, event wiring |
-| `models.py` | API model library (46 models with per-token pricing) |
-| `gpus.py` | GPU instance library (56 instances across 10 providers) |
+| `models.py` | API model library (52 models with per-token pricing) |
+| `gpus.py` | GPU instance library (58 instances across 10 providers) |
 | `test_app.py` | 81 unit tests covering helpers, calculations, and integration |
 | `SOURCES.md` | All pricing data sources for future updates |
 
