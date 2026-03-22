@@ -940,7 +940,7 @@ def build_app():
 
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
-                gr.Markdown("### Model Library — March 22, 2026 Pricing\nSources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing, openrouter.ai", elem_classes="section-label")
+                gr.Markdown("### Model Library — March 22, 2026 Pricing\nSources: [openai.com/api/pricing](https://openai.com/api/pricing), [docs.anthropic.com](https://docs.anthropic.com/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     inp = f"${m['input']}" if m["input"] is not None else "N/A (self-hosted)"
@@ -955,14 +955,14 @@ def build_app():
 
             # ─────────────────── Tab 7: GPU Library ─────────────────
             with gr.Tab("GPU Library"):
-                gr.Markdown("### GPU Instance Pricing — March 22, 2026\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** AWS us-east-1, GCP us-central1, Azure East US, CoreWeave US-East, Crusoe us-north1, FluidStack US, Lambda US, RunPod US, Together US, Vast.ai US (marketplace)", elem_classes="section-label")
+                gr.Markdown("### GPU Instance Pricing — March 22, 2026\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** [AWS](https://aws.amazon.com/ec2/pricing/on-demand/) us-east-1, [GCP](https://cloud.google.com/compute/gpus-pricing) us-central1, [Azure](https://azure.microsoft.com/en-us/pricing/details/virtual-machines/) East US, [CoreWeave](https://www.coreweave.com/pricing) US-East, [Crusoe](https://www.crusoe.ai/cloud/pricing) us-north1, [FluidStack](https://www.fluidstack.io/pricing) US, [Lambda](https://lambda.ai/pricing) US, [RunPod](https://www.runpod.io/gpu-pricing) US, [Together](https://www.together.ai/pricing) US, [Vast.ai](https://vast.ai) US (marketplace)", elem_classes="section-label")
                 gpu_df = pd.DataFrame([
                     {"Instance": k, "Provider": v["provider"], "GPU": v["gpu"],
                      "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}
                     for k, v in GPU_LIBRARY.items()
                 ])
                 gr.Dataframe(value=gpu_df, label="GPU Instance Pricing (March 22, 2026)", interactive=False)
-                gr.Markdown("*Sources: aws.amazon.com, cloud.google.com, azure.microsoft.com, coreweave.com, crusoe.ai, fluidstack.io, lambda.ai, runpod.io, together.ai, vast.ai*")
+                gr.Markdown("*Sources: [aws.amazon.com](https://aws.amazon.com/ec2/pricing/on-demand/), [cloud.google.com](https://cloud.google.com/compute/gpus-pricing), [azure.microsoft.com](https://azure.microsoft.com/en-us/pricing/details/virtual-machines/), [coreweave.com](https://www.coreweave.com/pricing), [crusoe.ai](https://www.crusoe.ai/cloud/pricing), [fluidstack.io](https://www.fluidstack.io/pricing), [lambda.ai](https://lambda.ai/pricing), [runpod.io](https://www.runpod.io/gpu-pricing), [together.ai](https://www.together.ai/pricing), [vast.ai](https://vast.ai)*")
 
         # ─────────────────── Event Wiring ─────────────────────────────
         all_inputs = [
