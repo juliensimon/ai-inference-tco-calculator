@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of March 22, 2026
+Pricing as of March 26, 2026
 
 Sources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing, openrouter.ai
 """
@@ -37,7 +37,7 @@ MODEL_LIBRARY = {
     "Gemini 3 Pro":          {"provider": "Google",    "input": 2,     "output": 12,    "notes": "Previous flagship"},
     "Gemini 3 Flash":        {"provider": "Google",    "input": 0.5,   "output": 3,     "notes": "Pro-grade reasoning at Flash speed"},
     "Gemini 3.1 Flash Lite": {"provider": "Google",    "input": 0.25,  "output": 1.5,   "notes": "Cost-efficient 3.1 variant, Mar 2026"},
-    "Gemini 2.5 Pro":        {"provider": "Google",    "input": 1,     "output": 10,    "notes": "Production-ready, 1M context (input price dropped)"},
+    "Gemini 2.5 Pro":        {"provider": "Google",    "input": 1.25,  "output": 10,    "notes": "Production-ready, 1M context"},
     "Gemini 2.5 Flash":      {"provider": "Google",    "input": 0.3,   "output": 2.5,   "notes": "Capable budget option (repriced Mar 2026)"},
     "Gemini 2.5 Flash-Lite": {"provider": "Google",    "input": 0.1,   "output": 0.4,   "notes": "Preview ending Mar 31, 2026"},
     "Gemini 2.0 Flash-Lite": {"provider": "Google",    "input": 0.075, "output": 0.3,   "notes": "Cheapest Google model, retiring Jun 2026"},
@@ -45,11 +45,12 @@ MODEL_LIBRARY = {
     "Grok 4":                {"provider": "xAI",       "input": 3,     "output": 15,    "notes": "256K context, Jul 2025"},
     "Grok 4.1 Fast":         {"provider": "xAI",       "input": 0.2,   "output": 0.5,   "notes": "2M context, very competitive pricing"},
     "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, available on OpenRouter"},
+    "Mistral Small 4":       {"provider": "Mistral",   "input": 0.15,  "output": 0.6,   "notes": "Hybrid reasoning, multimodal, 262K context. Via OpenRouter."},
     "DeepSeek V3.2":         {"provider": "DeepSeek",  "input": 0.28,  "output": 0.42,  "notes": "Cost-effective API, strong coding/math"},
     "Qwen3 Max":             {"provider": "Alibaba",   "input": 0.78,  "output": 3.9,   "notes": "Qwen flagship, 262K context. Via OpenRouter."},
     "Qwen3.5 Plus":          {"provider": "Alibaba",   "input": 0.26,  "output": 1.56,  "notes": "Qwen mid-tier. Via OpenRouter."},
     "Qwen3.5 397B A17B":     {"provider": "Alibaba",   "input": 0.39,  "output": 2.34,  "notes": "Open-weights 397B MoE (17B active), vision-language. Via OpenRouter."},
-    "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.07,  "output": 0.1,   "notes": "Open-weights 235B MoE (22B active), Instruct. Via OpenRouter."},
+    "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.455, "output": 1.82,  "notes": "Open-weights 235B MoE (22B active), Instruct. Via OpenRouter."},
     "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.45,  "output": 2.2,   "notes": "Strong coding & math, 262K context. Via OpenRouter."},
     "MiniMax M2.7":          {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "Latest MiniMax flagship. Via OpenRouter."},
     "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.2,   "output": 1.17,  "notes": "Previous MiniMax flagship. Via OpenRouter."},

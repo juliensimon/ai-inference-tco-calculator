@@ -1,6 +1,6 @@
 """
 GPU Instance Library — per-GPU on-demand hourly pricing for inference
-Pricing as of March 22, 2026
+Pricing as of March 26, 2026
 
 Sources: aws.amazon.com, cloud.google.com, azure.microsoft.com,
          coreweave.com, crusoe.ai, fluidstack.io, lambda.ai,
@@ -61,9 +61,8 @@ GPU_LIBRARY = {
     "RunPod - H100 PCIe":                   {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 1.99,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - H100 SXM":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 2.69,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - H200 SXM":                    {"provider": "RunPod",    "gpu": "H200",  "cost_hr": 3.59,  "vram_gb": 141, "notes": "Secure Cloud on-demand"},
-    "RunPod - L4":                          {"provider": "RunPod",    "gpu": "L4",    "cost_hr": 0.39,  "vram_gb": 24,  "notes": "Secure Cloud on-demand"},
+    "RunPod - L4":                          {"provider": "RunPod",    "gpu": "L4",    "cost_hr": 0.44,  "vram_gb": 24,  "notes": "Secure Cloud on-demand"},
     "RunPod - L40S":                        {"provider": "RunPod",    "gpu": "L40S",  "cost_hr": 0.79,  "vram_gb": 48,  "notes": "Secure Cloud on-demand"},
-    "RunPod - MI300X":                      {"provider": "RunPod",    "gpu": "MI300X", "cost_hr": 2.99, "vram_gb": 192, "notes": "Community Cloud on-demand"},
     # ── Together AI ──────────────────────────────────────────────────────────
     "Together - B200":                      {"provider": "Together",  "gpu": "B200",  "cost_hr": 7.49,  "vram_gb": 192, "notes": "GPU cluster on-demand"},
     "Together - H100":                      {"provider": "Together",  "gpu": "H100",  "cost_hr": 3.49,  "vram_gb": 80,  "notes": "GPU cluster on-demand"},
