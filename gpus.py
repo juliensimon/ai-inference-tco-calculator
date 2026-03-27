@@ -1,6 +1,6 @@
 """
 GPU Instance Library — per-GPU on-demand hourly pricing for inference
-Pricing as of March 26, 2026
+Pricing as of March 27, 2026
 
 Sources: aws.amazon.com, cloud.google.com, azure.microsoft.com,
          coreweave.com, crusoe.ai, fluidstack.io, lambda.ai,

@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of March 26, 2026
+Pricing as of March 27, 2026
 
 Sources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing, openrouter.ai
 """
@@ -31,20 +31,17 @@ MODEL_LIBRARY = {
     "Claude Opus 4.5":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous flagship, same pricing as 4.6"},
     "Claude Sonnet 4.5":     {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Previous Sonnet, same pricing as 4.6"},
     "Claude Sonnet 4":       {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Previous generation Sonnet"},
-    "Claude Haiku 3.5":      {"provider": "Anthropic", "input": 0.8,   "output": 4,     "notes": "Deprecated Feb 2026"},
     "Claude Haiku 3":        {"provider": "Anthropic", "input": 0.25,  "output": 1.25,  "notes": "Retiring Apr 2026"},
     "Gemini 3.1 Pro":        {"provider": "Google",    "input": 2,     "output": 12,    "notes": "Latest Google flagship, Mar 2026"},
-    "Gemini 3 Pro":          {"provider": "Google",    "input": 2,     "output": 12,    "notes": "Previous flagship"},
     "Gemini 3 Flash":        {"provider": "Google",    "input": 0.5,   "output": 3,     "notes": "Pro-grade reasoning at Flash speed"},
     "Gemini 3.1 Flash Lite": {"provider": "Google",    "input": 0.25,  "output": 1.5,   "notes": "Cost-efficient 3.1 variant, Mar 2026"},
     "Gemini 2.5 Pro":        {"provider": "Google",    "input": 1.25,  "output": 10,    "notes": "Production-ready, 1M context"},
     "Gemini 2.5 Flash":      {"provider": "Google",    "input": 0.3,   "output": 2.5,   "notes": "Capable budget option (repriced Mar 2026)"},
-    "Gemini 2.5 Flash-Lite": {"provider": "Google",    "input": 0.1,   "output": 0.4,   "notes": "Preview ending Mar 31, 2026"},
+    "Gemini 2.5 Flash-Lite": {"provider": "Google",    "input": 0.1,   "output": 0.4,   "notes": "Cost-efficient, now GA"},
     "Gemini 2.0 Flash-Lite": {"provider": "Google",    "input": 0.075, "output": 0.3,   "notes": "Cheapest Google model, retiring Jun 2026"},
     "Grok 4.20":             {"provider": "xAI",       "input": 2,     "output": 6,     "notes": "New flagship, 2M context, Mar 2026"},
-    "Grok 4":                {"provider": "xAI",       "input": 3,     "output": 15,    "notes": "256K context, Jul 2025"},
     "Grok 4.1 Fast":         {"provider": "xAI",       "input": 0.2,   "output": 0.5,   "notes": "2M context, very competitive pricing"},
-    "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, available on OpenRouter"},
+    "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, via Mistral API"},
     "Mistral Small 4":       {"provider": "Mistral",   "input": 0.15,  "output": 0.6,   "notes": "Hybrid reasoning, multimodal, 262K context. Via OpenRouter."},
     "DeepSeek V3.2":         {"provider": "DeepSeek",  "input": 0.28,  "output": 0.42,  "notes": "Cost-effective API, strong coding/math"},
     "Qwen3 Max":             {"provider": "Alibaba",   "input": 0.78,  "output": 3.9,   "notes": "Qwen flagship, 262K context. Via OpenRouter."},
