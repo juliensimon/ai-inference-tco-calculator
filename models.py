@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of March 27, 2026
+Pricing as of March 31, 2026
 
 Sources: openai.com/api/pricing, docs.anthropic.com, ai.google.dev/gemini-api/docs/pricing, openrouter.ai
 """
@@ -42,20 +42,19 @@ MODEL_LIBRARY = {
     "Grok 4.20":             {"provider": "xAI",       "input": 2,     "output": 6,     "notes": "New flagship, 2M context, Mar 2026"},
     "Grok 4.1 Fast":         {"provider": "xAI",       "input": 0.2,   "output": 0.5,   "notes": "2M context, very competitive pricing"},
     "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, via Mistral API"},
+    "Mistral Medium 3":      {"provider": "Mistral",   "input": 0.4,   "output": 2,     "notes": "Enterprise-grade, 131K context. Via OpenRouter."},
     "Mistral Small 4":       {"provider": "Mistral",   "input": 0.15,  "output": 0.6,   "notes": "Hybrid reasoning, multimodal, 262K context. Via OpenRouter."},
     "DeepSeek V3.2":         {"provider": "DeepSeek",  "input": 0.28,  "output": 0.42,  "notes": "Cost-effective API, strong coding/math"},
     "Qwen3 Max":             {"provider": "Alibaba",   "input": 0.78,  "output": 3.9,   "notes": "Qwen flagship, 262K context. Via OpenRouter."},
     "Qwen3.5 Plus":          {"provider": "Alibaba",   "input": 0.26,  "output": 1.56,  "notes": "Qwen mid-tier. Via OpenRouter."},
     "Qwen3.5 397B A17B":     {"provider": "Alibaba",   "input": 0.39,  "output": 2.34,  "notes": "Open-weights 397B MoE (17B active), vision-language. Via OpenRouter."},
     "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.455, "output": 1.82,  "notes": "Open-weights 235B MoE (22B active), Instruct. Via OpenRouter."},
-    "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.45,  "output": 2.2,   "notes": "Strong coding & math, 262K context. Via OpenRouter."},
+    "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.42,  "output": 2.2,   "notes": "Strong coding & math, 262K context. Via OpenRouter."},
     "MiniMax M2.7":          {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "Latest MiniMax flagship. Via OpenRouter."},
     "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.2,   "output": 1.17,  "notes": "Previous MiniMax flagship. Via OpenRouter."},
     "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter."},
     "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.15,  "output": 0.6,   "notes": "Open-weights 400B MoE (17B active). Via OpenRouter."},
     "Llama 4 Scout":         {"provider": "Meta",       "input": 0.08,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter."},
-    "Arcee Trinity Large":   {"provider": "Arcee AI",   "input": 0,     "output": 0,     "notes": "Open-weights 400B MoE (13B active), 512K context. Preview, free on OpenRouter."},
-    "Arcee Trinity Mini":    {"provider": "Arcee AI",   "input": 0.045, "output": 0.15,  "notes": "Open-weights 26B MoE (3B active), 128K context. Via OpenRouter."},
     "Arcee Trinity Nano":    {"provider": "Arcee AI",   "input": None,  "output": None,  "notes": "Open-weights 6B MoE (1B active), 128K context. Self-hosted only."},
 }
 
