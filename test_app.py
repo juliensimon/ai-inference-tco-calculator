@@ -187,7 +187,7 @@ class TestGetModelPrices:
 class TestGetGpuPrice:
     def test_known_instance(self):
         price = get_gpu_price("RunPod - H100 SXM")
-        assert price == 2.69
+        assert price == 3.29
 
     def test_unknown_instance(self):
         # Should return gr.update() for unknown

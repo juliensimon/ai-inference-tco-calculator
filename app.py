@@ -1,7 +1,7 @@
 """
 AI Inference TCO Calculator
 By Julien Simon | AI Operating Partner, Fortino Capital
-Pricing as of March 22, 2026
+Pricing as of July 9, 2026
 """
 
 import gradio as gr
@@ -776,7 +776,7 @@ def build_app():
         gr.Markdown(
             '<div class="hero-banner">'
             '<h1>AI Infrastructure TCO Calculator</h1>'
-            '<p class="byline">By Julien Simon &nbsp;|&nbsp; AI Operating Partner, Fortino Capital &nbsp;|&nbsp; March 22, 2026 Pricing</p>'
+            '<p class="byline">By Julien Simon &nbsp;|&nbsp; AI Operating Partner, Fortino Capital &nbsp;|&nbsp; July 9, 2026 Pricing</p>'
             '<p class="tagline">Compare API costs, self-hosted GPU, and local/edge deployment for AI inference workloads.<br>'
             'Fill in your parameters below, then explore the analysis tabs.</p>'
             '</div>'
@@ -940,7 +940,7 @@ def build_app():
 
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
-                gr.Markdown("### Model Library — March 22, 2026 Pricing\nSources: [openai.com/api/pricing](https://openai.com/api/pricing), [docs.anthropic.com](https://docs.anthropic.com/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
+                gr.Markdown("### Model Library — July 9, 2026 Pricing\nSources: [openai.com/api/pricing](https://openai.com/api/pricing), [docs.anthropic.com](https://docs.anthropic.com/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     inp = f"${m['input']}" if m["input"] is not None else "N/A (self-hosted)"
@@ -955,13 +955,13 @@ def build_app():
 
             # ─────────────────── Tab 7: GPU Library ─────────────────
             with gr.Tab("GPU Library"):
-                gr.Markdown("### GPU Instance Library — March 22, 2026 Pricing\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** AWS us-east-1, GCP us-central1, Azure East US, CoreWeave US-East, Crusoe us-north1, FluidStack US, Lambda US, RunPod US, Together US, Vast.ai US (marketplace)", elem_classes="section-label")
+                gr.Markdown("### GPU Instance Library — July 9, 2026 Pricing\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** AWS us-east-1, GCP us-central1, Azure East US/East US 2, CoreWeave US-East, Crusoe us-north1, Lambda US, RunPod US, Together US, Vast.ai US (marketplace)", elem_classes="section-label")
                 gpu_df = pd.DataFrame([
                     {"Instance": k, "Provider": v["provider"], "GPU": v["gpu"],
                      "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}
                     for k, v in GPU_LIBRARY.items()
                 ])
-                gr.Dataframe(value=gpu_df, label="GPU Instance Pricing (March 22, 2026)", interactive=False)
+                gr.Dataframe(value=gpu_df, label="GPU Instance Pricing (July 9, 2026)", interactive=False)
                 gr.Markdown("*Sources: [aws.amazon.com](https://aws.amazon.com/ec2/pricing/on-demand/), [cloud.google.com](https://cloud.google.com/compute/gpus-pricing), [azure.microsoft.com](https://azure.microsoft.com/en-us/pricing/details/virtual-machines/), [coreweave.com](https://www.coreweave.com/pricing), [crusoe.ai](https://www.crusoe.ai/cloud/pricing), [fluidstack.io](https://www.fluidstack.io/pricing), [lambda.ai](https://lambda.ai/pricing), [runpod.io](https://www.runpod.io/gpu-pricing), [together.ai](https://www.together.ai/pricing), [vast.ai](https://vast.ai)*")
 
         # ─────────────────── Event Wiring ─────────────────────────────
