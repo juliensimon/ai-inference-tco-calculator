@@ -5,6 +5,8 @@ Tests calculation functions, helpers, data integrity, and master_update.
 
 import pytest
 import math
+import re
+import pathlib
 from models import MODEL_LIBRARY, API_MODELS
 from gpus import GPU_LIBRARY, GPU_PROVIDERS
 from app import (
@@ -12,8 +14,30 @@ from app import (
     get_model_prices, get_gpu_price, get_gpu_instances,
     calc_usage, calc_api, calc_smart_routing,
     calc_self_hosted, calc_local, master_update,
-    DEFAULT_MODELS,
+    DEFAULT_MODELS, PRICING_DATE,
 )
+
+_MONTHS = ("January|February|March|April|May|June|July"
+           "|August|September|October|November|December")
+
+
+class TestPricingDate:
+    """The pricing date is shown in four places in the UI. It once drifted:
+    the data-file docstrings said July 31 while the banner and both library
+    tabs still said July 9, so the deployed Space advertised stale pricing."""
+
+    def test_ui_dates_all_come_from_the_constant(self):
+        src = (pathlib.Path(__file__).parent / "app.py").read_text()
+        found = set(re.findall(rf"(?:{_MONTHS})\s+\d{{1,2}},\s+\d{{4}}", src))
+        assert found <= {PRICING_DATE}, (
+            f"hardcoded date(s) in app.py: {sorted(found - {PRICING_DATE})} — "
+            f"use PRICING_DATE instead")
+
+    def test_data_files_agree_with_the_constant(self):
+        import models, gpus
+        for mod in (models, gpus):
+            assert f"Pricing as of {PRICING_DATE}" in mod.__doc__, (
+                f"{mod.__name__} docstring disagrees with PRICING_DATE")
 
 
 # ═════════════════════════════════════════════════════════════════════════════
