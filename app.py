@@ -1,7 +1,7 @@
 """
 AI Inference TCO Calculator
 By Julien Simon | AI Operating Partner, Fortino Capital
-Pricing as of July 9, 2026
+Pricing as of July 31, 2026
 """
 
 import gradio as gr

@@ -161,9 +161,11 @@ class TestGPULibrary:
 
 class TestGetModelPrices:
     def test_known_model(self):
+        # Pinned to the library, not literals: prices change every refresh,
+        # but the lookup must always return that model's input/output pair.
+        m = MODEL_LIBRARY["Claude Sonnet 4.6"]
         inp, out = get_model_prices("Claude Sonnet 4.6")
-        assert inp == 3.0
-        assert out == 15.0
+        assert (inp, out) == (float(m["input"]), float(m["output"]))
 
     def test_unknown_model(self):
         assert get_model_prices("NonExistent") == (0.0, 0.0)
@@ -186,8 +188,11 @@ class TestGetModelPrices:
 
 class TestGetGpuPrice:
     def test_known_instance(self):
+        # Pinned to the library, not a literal: prices change every refresh,
+        # but the lookup must always return that instance's cost_hr.
         price = get_gpu_price("RunPod - H100 SXM")
-        assert price == 3.29
+        assert price == GPU_LIBRARY["RunPod - H100 SXM"]["cost_hr"]
+        assert isinstance(price, (int, float))
 
     def test_unknown_instance(self):
         # Should return gr.update() for unknown
