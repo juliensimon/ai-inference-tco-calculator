@@ -12,6 +12,7 @@ from app import (
     get_model_prices, get_gpu_price, get_gpu_instances,
     calc_usage, calc_api, calc_smart_routing,
     calc_self_hosted, calc_local, master_update,
+    DEFAULT_MODELS,
 )
 
 
@@ -93,6 +94,13 @@ class TestModelLibrary:
             m = MODEL_LIBRARY[name]
             assert m["input"] is not None
             assert m["output"] is not None
+
+    def test_default_models_are_selectable(self):
+        """A default naming a retired/renamed model silently shows $0.00 prices,
+        so every default must still be a priced entry in the dropdown."""
+        for name in DEFAULT_MODELS:
+            assert name in API_MODELS, f"default {name!r} is not a selectable API model"
+            assert get_model_prices(name) != (0.0, 0.0), f"default {name!r} priced at zero"
 
     def test_all_models_have_required_fields(self):
         for name, m in MODEL_LIBRARY.items():

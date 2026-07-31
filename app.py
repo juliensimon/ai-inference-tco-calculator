@@ -11,6 +11,11 @@ import pandas as pd
 from models import MODEL_LIBRARY, API_MODELS
 from gpus import GPU_LIBRARY, GPU_PROVIDERS
 
+# Default dropdown selections: current-generation premium / balanced / budget.
+# The price boxes below read from the library, so they cannot drift from the
+# selected model the way hardcoded defaults did.
+DEFAULT_MODELS = ("Claude Sonnet 5", "GPT-5.6 Terra", "Gemini 3.5 Flash-Lite")
+
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -809,29 +814,35 @@ def build_app():
                 with gr.Row():
                     with gr.Column():
                         model_1 = gr.Dropdown(
-                            choices=API_MODELS, value="Claude Sonnet 4.6",
+                            choices=API_MODELS, value=DEFAULT_MODELS[0],
                             label="Provider 1: Model",
                             )
                         price_in_1 = gr.Number(
-                            value=3, label="Provider 1: Input $ / 1M tokens", interactive=False)
+                            value=get_model_prices(DEFAULT_MODELS[0])[0],
+                            label="Provider 1: Input $ / 1M tokens", interactive=False)
                         price_out_1 = gr.Number(
-                            value=15, label="Provider 1: Output $ / 1M tokens", interactive=False)
+                            value=get_model_prices(DEFAULT_MODELS[0])[1],
+                            label="Provider 1: Output $ / 1M tokens", interactive=False)
                     with gr.Column():
                         model_2 = gr.Dropdown(
-                            choices=API_MODELS, value="GPT-5",
+                            choices=API_MODELS, value=DEFAULT_MODELS[1],
                             label="Provider 2: Model")
                         price_in_2 = gr.Number(
-                            value=1.25, label="Provider 2: Input $ / 1M tokens", interactive=False)
+                            value=get_model_prices(DEFAULT_MODELS[1])[0],
+                            label="Provider 2: Input $ / 1M tokens", interactive=False)
                         price_out_2 = gr.Number(
-                            value=10, label="Provider 2: Output $ / 1M tokens", interactive=False)
+                            value=get_model_prices(DEFAULT_MODELS[1])[1],
+                            label="Provider 2: Output $ / 1M tokens", interactive=False)
                     with gr.Column():
                         model_3 = gr.Dropdown(
-                            choices=API_MODELS, value="Gemini 2.5 Flash",
+                            choices=API_MODELS, value=DEFAULT_MODELS[2],
                             label="Provider 3: Model")
                         price_in_3 = gr.Number(
-                            value=0.15, label="Provider 3: Input $ / 1M tokens", interactive=False)
+                            value=get_model_prices(DEFAULT_MODELS[2])[0],
+                            label="Provider 3: Input $ / 1M tokens", interactive=False)
                         price_out_3 = gr.Number(
-                            value=0.6, label="Provider 3: Output $ / 1M tokens", interactive=False)
+                            value=get_model_prices(DEFAULT_MODELS[2])[1],
+                            label="Provider 3: Output $ / 1M tokens", interactive=False)
                     with gr.Column():
                         model_4_name = gr.Textbox(
                             value="Custom Provider",
