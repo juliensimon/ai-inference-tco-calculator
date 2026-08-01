@@ -81,7 +81,7 @@ pytest test_app.py -v
 | `app.py` | UI, calculations, charts, event wiring |
 | `models.py` | API model library (77 models with per-token pricing) |
 | `gpus.py` | GPU instance library (63 instances across 9 providers) |
-| `test_app.py` | 84 unit tests covering helpers, calculations, and integration |
+| `test_app.py` | 90 unit tests covering helpers, calculations, and integration |
 | `SOURCES.md` | All pricing data sources for future updates |
 
 ## Data Sources

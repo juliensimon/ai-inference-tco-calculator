@@ -155,15 +155,16 @@ def calc_self_hosted(gpu_cost_hr, num_gpus, hours_day, days_year, throughput,
 
 
 def calc_local(hw_cost, num_dev, lifetime, watts, elec_rate, hours_day, days_year,
-               throughput, it_support, total_day, total_year_M):
+               throughput, utilization, it_support, sw_cost, total_day, total_year_M):
     hw_a = (hw_cost * num_dev / lifetime) if lifetime > 0 else 0
     elec = watts * num_dev * hours_day / 1000 * days_year * elec_rate
-    sw = 500
-    total = hw_a + elec + it_support + sw
-    max_tok = throughput * 3600 * hours_day * num_dev
+    total = hw_a + elec + it_support + sw_cost
+    # Derated by utilization exactly as calc_self_hosted does, so the two
+    # Capacity Headroom figures are computed on the same basis.
+    max_tok = throughput * num_dev * 3600 * hours_day * utilization / 100
     headroom = ((max_tok - total_day) / total_day) if total_day > 0 else float("inf")
     return {
-        "hw_a": hw_a, "elec": elec, "it": it_support, "sw": sw,
+        "hw_a": hw_a, "elec": elec, "it": it_support, "sw": sw_cost,
         "total": total, "monthly": total / 12,
         "max_tok": max_tok, "headroom": headroom,
         "cost_per_M": total / total_year_M if total_year_M > 0 else 0,
@@ -286,7 +287,7 @@ def master_update(
     gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
     sh_sw_cost, sh_net_cost,
     hw_cost, num_dev, watts, elec_rate, hw_life,
-    local_hours, local_throughput, it_support,
+    local_util, local_hours, local_throughput, it_support, local_sw_cost,
 ):
     # ── Safe conversions ──
     input_tpr = sf(input_tpr, 500)
@@ -309,9 +310,11 @@ def master_update(
     watts = sf(watts, 575)
     elec_rate = sf(elec_rate, 0.12)
     hw_life = max(sf(hw_life, 3), 1)
+    local_util = sf(local_util, 70)
     local_hours = sf(local_hours, 24)
     local_throughput = sf(local_throughput, 100)
     it_support = sf(it_support, 5000)
+    local_sw_cost = sf(local_sw_cost, 500)
 
     # ── Usage ──
     u = calc_usage(input_tpr, output_tpr, req_day, days_year)
@@ -445,7 +448,8 @@ def master_update(
     # ── Local / Edge ──
     le = calc_local(
         hw_cost, num_dev, hw_life, watts, elec_rate, local_hours, days_year,
-        local_throughput, it_support, u["total_day"], total_year_M,
+        local_throughput, local_util, it_support, local_sw_cost,
+        u["total_day"], total_year_M,
     )
 
     le_df = pd.DataFrame({
@@ -565,7 +569,13 @@ def master_update(
     api_cost_per_req = best_api["total"] / (req_day * days_year) if req_day > 0 else 0
     if api_cost_per_req > 0:
         be_req_day = sh["total"] / (api_cost_per_req * days_year)
-        if be_req_day <= req_day:
+        # The break-even is pure cost arithmetic, so it can land above what the
+        # configured GPUs can actually serve. Say so rather than presenting an
+        # unreachable volume as a target.
+        tok_per_req = input_tpr + output_tpr
+        if sh["max_tok"] > 0 and be_req_day * tok_per_req > sh["max_tok"]:
+            breakeven = f"{fmt_n(be_req_day)} req/day (over capacity)"
+        elif be_req_day <= req_day:
             breakeven = f"{fmt_n(be_req_day)} req/day"
         else:
             breakeven = f"Need {fmt_n(be_req_day)} req/day"
@@ -592,7 +602,8 @@ def master_update(
             _card("Annual Savings", fmt_c(savings_val), "success"),
             _card("Savings %", fmt_p(savings_pct), "success"),
             _card("Break-Even (Self-Hosted)", breakeven,
-                  "warning" if "Need" in breakeven else "default"),
+                  "warning" if ("Need" in breakeven or "over capacity" in breakeven)
+                  else "default"),
         )
     )
 
@@ -922,6 +933,14 @@ def build_app():
                     it_support = gr.Number(
                         value=5000, label="IT support cost (annual $)",
                         info="Maintenance, updates, monitoring")
+                with gr.Row():
+                    local_util = gr.Slider(
+                        minimum=0, maximum=100, value=70, step=5,
+                        label="Device utilization (%)",
+                        info="60-80% typical")
+                    local_sw_cost = gr.Number(
+                        value=500, label="Software / licensing (annual $)",
+                        info="Ollama, llama.cpp, monitoring tools")
 
             # ─────────────────── Tab 2: API Costs ─────────────────────
             with gr.Tab("API Costs"):
@@ -955,11 +974,13 @@ def build_app():
 
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
-                gr.Markdown(f"### Model Library — {PRICING_DATE} Pricing\nSources: [openai.com](https://developers.openai.com/api/docs/pricing), [platform.claude.com](https://platform.claude.com/docs/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [docs.x.ai](https://docs.x.ai/docs/models), [api-docs.deepseek.com](https://api-docs.deepseek.com/quick_start/pricing), [alibabacloud.com](https://www.alibabacloud.com/help/en/model-studio/model-pricing), [platform.kimi.ai](https://platform.kimi.ai/docs/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
+                gr.Markdown(f"### Model Library — {PRICING_DATE} Pricing\nSources: [openai.com](https://developers.openai.com/api/docs/pricing), [platform.claude.com](https://platform.claude.com/docs/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [docs.x.ai](https://docs.x.ai/docs/models), [api-docs.deepseek.com](https://api-docs.deepseek.com/quick_start/pricing), [mistral.ai](https://mistral.ai/pricing/api/), [alibabacloud.com](https://www.alibabacloud.com/help/en/model-studio/model-pricing), [platform.kimi.ai](https://platform.kimi.ai/docs/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
-                    inp = f"${m['input']}" if m["input"] is not None else "N/A (self-hosted)"
-                    out = f"${m['output']}" if m["output"] is not None else "N/A (self-hosted)"
+                    # None means "no published per-token price" — that covers
+                    # self-hosted, subscription-only and invite-only models alike.
+                    inp = f"${m['input']}" if m["input"] is not None else "N/A (no per-token price)"
+                    out = f"${m['output']}" if m["output"] is not None else "N/A (no per-token price)"
                     lib_rows.append([name, m["provider"], inp, out, m["notes"]])
                 lib_df = pd.DataFrame(
                     lib_rows,
@@ -989,7 +1010,7 @@ def build_app():
             gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
             sh_sw_cost, sh_net_cost,
             hw_cost, num_dev, watts, elec_rate, hw_life,
-            local_hours, local_throughput, it_support,
+            local_util, local_hours, local_throughput, it_support, local_sw_cost,
         ]
 
         all_outputs = [
@@ -1035,7 +1056,7 @@ def build_app():
             gpu_cost_hr, num_gpus, gpu_util, gpu_hours, gpu_throughput,
             sh_sw_cost, sh_net_cost,
             hw_cost, num_dev, watts, elec_rate, hw_life,
-            local_hours, local_throughput, it_support,
+            local_util, local_hours, local_throughput, it_support, local_sw_cost,
         ]
         for inp in change_inputs:
             inp.change(fn=master_update, inputs=all_inputs, outputs=all_outputs)

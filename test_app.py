@@ -139,11 +139,23 @@ class TestModelLibrary:
                 assert m["input"] >= 0, f"{name} has negative input price"
                 assert m["output"] >= 0, f"{name} has negative output price"
 
-    def test_self_hosted_only_models_excluded_from_api(self):
-        """Models with None pricing should not appear in API_MODELS."""
+    def test_unpriced_models_excluded_from_api(self):
+        """Models with None pricing should not appear in API_MODELS. None means
+        "no published per-token price" — self-hosted, subscription-only or
+        invite-only alike — not "self-hosted"."""
         for name, m in MODEL_LIBRARY.items():
             if m["input"] is None:
                 assert name not in API_MODELS, f"{name} should not be in API_MODELS"
+
+    def test_library_tab_does_not_call_unpriced_models_self_hosted(self):
+        """The Model Library once rendered every None-priced model as
+        "N/A (self-hosted)". That held only while the sole unpriced entry was
+        self-hosted; it became false the moment a subscription-only model
+        (Qwen3.8 Max Preview) was the only one left."""
+        src = (pathlib.Path(__file__).parent / "app.py").read_text()
+        assert "N/A (self-hosted)" not in src, (
+            "unpriced models are labelled self-hosted, but None only means "
+            "there is no published per-token price")
 
 
 class TestGPULibrary:
@@ -186,6 +198,13 @@ class TestGPULibrary:
             parts = name.split(" - ")
             assert len(parts) >= 2, f"{name} doesn't follow 'Provider - GPU' format"
 
+    def test_key_prefix_matches_provider(self):
+        """The key's provider prefix must match the provider field, or the
+        instance is silently filed under the wrong GPU-provider dropdown."""
+        for name, g in GPU_LIBRARY.items():
+            assert name.split(" - ")[0] == g["provider"], (
+                f"{name} has provider {g['provider']!r}")
+
 
 # ═════════════════════════════════════════════════════════════════════════════
 # LOOKUP HELPERS
@@ -208,7 +227,7 @@ class TestGetModelPrices:
     def test_empty_string(self):
         assert get_model_prices("") == (0.0, 0.0)
 
-    def test_self_hosted_only_model(self):
+    def test_unpriced_model_returns_zero(self):
         """Models with None pricing should return (0.0, 0.0)."""
         # Pinned to the library, not a literal: unpriced models come and go.
         unpriced = [n for n, m in MODEL_LIBRARY.items() if m["input"] is None]
@@ -432,7 +451,7 @@ class TestCalcLocal:
             hw_cost=1999, num_dev=1, lifetime=3,
             watts=575, elec_rate=0.12,
             hours_day=24, days_year=365,
-            throughput=100, it_support=5000,
+            throughput=100, utilization=70, it_support=5000, sw_cost=500,
             total_day=7_000_000, total_year_M=2555.0,
         )
         expected_hw = 1999 / 3
@@ -447,10 +466,34 @@ class TestCalcLocal:
             hw_cost=1999, num_dev=1, lifetime=0,
             watts=575, elec_rate=0.12,
             hours_day=24, days_year=365,
-            throughput=100, it_support=5000,
+            throughput=100, utilization=70, it_support=5000, sw_cost=500,
             total_day=1000, total_year_M=0.365,
         )
         assert le["hw_a"] == 0
+
+    def test_capacity_is_derated_by_utilization(self):
+        """Local capacity must be derated like self-hosted, otherwise the two
+        Capacity Headroom cards are computed on different bases and the
+        comparison silently favours local hardware."""
+        kwargs = dict(
+            hw_cost=1999, num_dev=2, lifetime=3, watts=575, elec_rate=0.12,
+            hours_day=24, days_year=365, throughput=100, it_support=5000,
+            sw_cost=500, total_day=1000, total_year_M=0.365,
+        )
+        full = calc_local(utilization=100, **kwargs)
+        half = calc_local(utilization=50, **kwargs)
+        assert full["max_tok"] == pytest.approx(100 * 2 * 3600 * 24)
+        assert half["max_tok"] == pytest.approx(full["max_tok"] / 2)
+
+    def test_software_cost_is_caller_supplied(self):
+        """Software cost is a user input, not a hardcoded $500."""
+        kwargs = dict(
+            hw_cost=0, num_dev=1, lifetime=3, watts=0, elec_rate=0,
+            hours_day=24, days_year=365, throughput=100, utilization=70,
+            it_support=0, total_day=1000, total_year_M=0.365,
+        )
+        assert calc_local(sw_cost=0, **kwargs)["total"] == pytest.approx(0)
+        assert calc_local(sw_cost=1234, **kwargs)["total"] == pytest.approx(1234)
 
 
 # ═════════════════════════════════════════════════════════════════════════════
@@ -469,7 +512,7 @@ class TestMasterUpdate:
         2.5, 1, 70, 24, 2300,                         # GPU params
         2000, 3000,                                    # sw/net costs
         1999, 1, 575, 0.12, 3,                        # local hw params
-        24, 100, 5000,                                 # local runtime params
+        70, 24, 100, 5000, 500,                        # local runtime params
     )
 
     def test_returns_correct_number_of_outputs(self):
@@ -582,3 +625,21 @@ class TestBreakEven:
         result = master_update(*args)
         comp_summary = result[10]
         assert "req/day" in comp_summary
+
+    def test_breakeven_flags_volume_the_gpus_cannot_serve(self):
+        """Break-even is pure cost arithmetic, so it can exceed what the
+        configured GPUs can actually serve. That has to be said, not presented
+        as a reachable target."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[16] = 100   # gpu_cost_hr = $100 — pushes break-even far out
+        args[20] = 1     # gpu_throughput = 1 tok/s — almost no capacity
+        result = master_update(*args)
+        assert "over capacity" in result[10]
+
+    def test_breakeven_silent_when_capacity_suffices(self):
+        """The capacity caveat must not fire when the GPUs can serve it."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[16] = 0.01      # cheap GPU — break-even well below current volume
+        args[20] = 1_000_000  # ample throughput
+        result = master_update(*args)
+        assert "over capacity" not in result[10]
