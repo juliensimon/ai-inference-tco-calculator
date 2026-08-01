@@ -1,10 +1,10 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of July 31, 2026
+Pricing as of August 1, 2026
 
 Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
          ai.google.dev/gemini-api/docs/pricing, docs.x.ai/docs/models,
-         api-docs.deepseek.com, openrouter.ai
+         api-docs.deepseek.com, mistral.ai/pricing/api, openrouter.ai
 """
 
 # Prices are in $ per 1M tokens
@@ -57,11 +57,15 @@ MODEL_LIBRARY = {
     "Grok 4.20":             {"provider": "xAI",       "input": 1.25,  "output": 2.5,   "notes": "2M context (price cut from $2/$6)"},
     "Grok Build 0.1":        {"provider": "xAI",       "input": 1,     "output": 2,     "notes": "Agentic build model; doubles above 200K-token prompts"},
     "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, via Mistral API"},
-    "Mistral Medium 3.5":    {"provider": "Mistral",   "input": 1.5,   "output": 7.5,   "notes": "New mid-tier, Jun 2026. Via OpenRouter."},
-    "Mistral Medium 3":      {"provider": "Mistral",   "input": 0.4,   "output": 2,     "notes": "Enterprise-grade, 131K context. Via OpenRouter."},
-    "Mistral Small 4":       {"provider": "Mistral",   "input": 0.15,  "output": 0.6,   "notes": "Hybrid reasoning, multimodal, 262K context. Via OpenRouter."},
-    "DeepSeek V4 Pro":       {"provider": "DeepSeek",  "input": 0.435, "output": 0.87,  "notes": "DeepSeek first-party API, cache-miss input, 1M context"},
-    "DeepSeek V4 Flash":     {"provider": "DeepSeek",  "input": 0.14,  "output": 0.28,  "notes": "First-party API; replaces V3.2 chat/reasoner endpoints"},
+    "Mistral Medium 3.5":    {"provider": "Mistral",   "input": 1.5,   "output": 7.5,   "notes": "Mid-tier flagship, 262K context, Jun 2026"},
+    "Mistral Medium 3":      {"provider": "Mistral",   "input": 0.4,   "output": 2,     "notes": "Legacy mid-tier, 131K context. Via OpenRouter."},
+    "Mistral Small 4":       {"provider": "Mistral",   "input": 0.15,  "output": 0.6,   "notes": "Hybrid reasoning, multimodal, 262K context"},
+    "Codestral":             {"provider": "Mistral",   "input": 0.3,   "output": 0.9,   "notes": "Coding specialist, 256K context"},
+    "Ministral 3 14B":       {"provider": "Mistral",   "input": 0.2,   "output": 0.2,   "notes": "Edge tier, 262K context; flat input/output rate"},
+    "Ministral 3 8B":        {"provider": "Mistral",   "input": 0.15,  "output": 0.15,  "notes": "Edge tier, 262K context; flat input/output rate"},
+    "Ministral 3 3B":        {"provider": "Mistral",   "input": 0.1,   "output": 0.1,   "notes": "Smallest Ministral, 131K context; flat input/output rate"},
+    "DeepSeek V4 Pro":       {"provider": "DeepSeek",  "input": 0.435, "output": 0.87,  "notes": "First-party API, cache-miss input, 1M context. 2x peak-hours pricing announced"},
+    "DeepSeek V4 Flash":     {"provider": "DeepSeek",  "input": 0.14,  "output": 0.28,  "notes": "First-party API, 1M context; replaces V3.2 endpoints. 2x peak-hours pricing announced"},
     "Qwen3.8 Max Preview":   {"provider": "Alibaba",   "input": None,  "output": None,  "notes": "2.4T multimodal preview, Jul 2026. Token Plan subscription only — no per-token API price"},
     "Qwen3.7 Max":           {"provider": "Alibaba",   "input": 1.25,  "output": 3.75,  "notes": "Model Studio (Singapore); list $2.50/$7.50 less 50% promo"},
     "Qwen3.7 Plus":          {"provider": "Alibaba",   "input": 0.32,  "output": 1.28,  "notes": "Model Studio ≤256K non-thinking; list $0.40/$1.60 less 20%"},
@@ -79,9 +83,9 @@ MODEL_LIBRARY = {
     "MiniMax M2.7":          {"provider": "MiniMax",    "input": 0.25,  "output": 1,     "notes": "Previous flagship. Via OpenRouter."},
     "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.15,  "output": 0.9,   "notes": "Older flagship. Via OpenRouter."},
     "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter."},
+    "Muse Spark 1.1":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Meta frontier tier, 1M context, Jul 2026. Cached input $0.15. Via OpenRouter."},
     "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.2,   "output": 0.8,   "notes": "Open-weights 400B MoE (17B active). Via OpenRouter."},
     "Llama 4 Scout":         {"provider": "Meta",       "input": 0.10,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter."},
-    "Arcee Trinity Nano":    {"provider": "Arcee AI",   "input": None,  "output": None,  "notes": "Open-weights 6B MoE (1B active), 128K context. Self-hosted only."},
 }
 
 API_MODELS = [name for name, m in MODEL_LIBRARY.items() if m["input"] is not None]

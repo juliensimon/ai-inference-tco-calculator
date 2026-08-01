@@ -210,7 +210,11 @@ class TestGetModelPrices:
 
     def test_self_hosted_only_model(self):
         """Models with None pricing should return (0.0, 0.0)."""
-        assert get_model_prices("Arcee Trinity Nano") == (0.0, 0.0)
+        # Pinned to the library, not a literal: unpriced models come and go.
+        unpriced = [n for n, m in MODEL_LIBRARY.items() if m["input"] is None]
+        assert unpriced, "no unpriced model in the library to exercise this path"
+        for name in unpriced:
+            assert get_model_prices(name) == (0.0, 0.0)
 
     def test_returns_floats(self):
         inp, out = get_model_prices("GPT-5")
