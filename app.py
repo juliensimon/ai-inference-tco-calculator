@@ -1,7 +1,7 @@
 """
 AI Inference TCO Calculator
 By Julien Simon | AI Operating Partner, Fortino Capital
-Pricing as of August 1, 2026
+Pricing as of August 19, 2026
 """
 
 import gradio as gr
@@ -13,7 +13,7 @@ from gpus import GPU_LIBRARY, GPU_PROVIDERS
 
 # Single source for every user-visible pricing date. Update this on a refresh —
 # it feeds the banner, both library tabs, and the GPU table label.
-PRICING_DATE = "August 1, 2026"
+PRICING_DATE = "August 19, 2026"
 
 # Default dropdown selections: current-generation premium / balanced / budget.
 # The price boxes below read from the library, so they cannot drift from the
@@ -974,7 +974,7 @@ def build_app():
 
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
-                gr.Markdown(f"### Model Library — {PRICING_DATE} Pricing\nSources: [openai.com](https://developers.openai.com/api/docs/pricing), [platform.claude.com](https://platform.claude.com/docs/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [docs.x.ai](https://docs.x.ai/docs/models), [api-docs.deepseek.com](https://api-docs.deepseek.com/quick_start/pricing), [mistral.ai](https://mistral.ai/pricing/api/), [alibabacloud.com](https://www.alibabacloud.com/help/en/model-studio/model-pricing), [platform.kimi.ai](https://platform.kimi.ai/docs/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
+                gr.Markdown(f"### Model Library — {PRICING_DATE} Pricing\nSources: [openai.com](https://developers.openai.com/api/docs/pricing), [platform.claude.com](https://platform.claude.com/docs/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [docs.x.ai](https://docs.x.ai/docs/models), [api-docs.deepseek.com](https://api-docs.deepseek.com/quick_start/pricing), [mistral.ai](https://mistral.ai/pricing/api/), [alibabacloud.com](https://www.alibabacloud.com/help/en/model-studio/model-pricing), [platform.kimi.ai](https://platform.kimi.ai/docs/pricing), [docs.z.ai](https://docs.z.ai/guides/overview/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     # None means "no published per-token price" — that covers

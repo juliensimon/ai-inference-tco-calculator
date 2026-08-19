@@ -1,6 +1,6 @@
 """
 GPU Instance Library — per-GPU on-demand hourly pricing for inference
-Pricing as of August 1, 2026
+Pricing as of August 19, 2026
 
 Sources: aws.amazon.com, cloud.google.com, prices.azure.com,
          coreweave.com, crusoe.ai, lambda.ai, runpod.io,
@@ -18,13 +18,17 @@ GPU_LIBRARY = {
     "AWS - L4 - g6.12xlarge":               {"provider": "AWS",       "gpu": "L4",    "cost_hr": 1.15,  "vram_gb": 24,  "notes": "4-GPU node, ~$4.60/hr total"},
     "AWS - L40S - g6e.xlarge":              {"provider": "AWS",       "gpu": "L40S",  "cost_hr": 1.86,  "vram_gb": 48,  "notes": "1-GPU instance"},
     "AWS - L40S - g6e.12xlarge":            {"provider": "AWS",       "gpu": "L40S",  "cost_hr": 2.62,  "vram_gb": 48,  "notes": "4-GPU node, ~$10.49/hr total"},
+    "AWS - RTX PRO 4500 - g7.2xlarge":      {"provider": "AWS",       "gpu": "RTX PRO 4500", "cost_hr": 2.52, "vram_gb": 32, "notes": "1-GPU instance"},
+    "AWS - RTX PRO 4500 - g7.48xlarge":     {"provider": "AWS",       "gpu": "RTX PRO 4500", "cost_hr": 3.56, "vram_gb": 32, "notes": "8-GPU node, ~$28.51/hr total"},
+    "AWS - RTX PRO 6000 - g7e.2xlarge":     {"provider": "AWS",       "gpu": "RTX PRO 6000", "cost_hr": 3.36, "vram_gb": 96, "notes": "1-GPU instance"},
+    "AWS - RTX PRO 6000 - g7e.48xlarge":    {"provider": "AWS",       "gpu": "RTX PRO 6000", "cost_hr": 4.14, "vram_gb": 96, "notes": "8-GPU node, ~$33.14/hr total"},
     # ── Azure ────────────────────────────────────────────────────────────────
     "Azure - A100 80GB - NC A100 v4":       {"provider": "Azure",     "gpu": "A100",  "cost_hr": 3.67,  "vram_gb": 80,  "notes": "1-GPU instance"},
     "Azure - GB200 - ND GB200 v6":          {"provider": "Azure",     "gpu": "GB200", "cost_hr": 27.04, "vram_gb": 186, "notes": "4-GPU node, ~$108.16/hr total"},
     "Azure - H100 - ND H100 v5":            {"provider": "Azure",     "gpu": "H100",  "cost_hr": 12.29, "vram_gb": 80,  "notes": "8-GPU node, ~$98.32/hr total"},
     "Azure - H200 - ND H200 v5":            {"provider": "Azure",     "gpu": "H200",  "cost_hr": 10.60, "vram_gb": 141, "notes": "8-GPU node, ~$84.80/hr total (East US 2)"},
     "Azure - MI300X - ND MI300X v5":        {"provider": "Azure",     "gpu": "MI300X", "cost_hr": 6.00, "vram_gb": 192, "notes": "8-GPU node, ~$48.00/hr total (East US 2)"},
-    "Azure - RTX PRO 6000 - NC144ds v6":    {"provider": "Azure",     "gpu": "RTX PRO 6000", "cost_hr": 5.50, "vram_gb": 96, "notes": "NC144ds_xl 1-GPU size; NC288ds_xl (2 GPU) ~$11.00/hr"},
+    "Azure - RTX PRO 6000 - NC144ds v6":    {"provider": "Azure",     "gpu": "RTX PRO 6000", "cost_hr": 6.38, "vram_gb": 96, "notes": "NC144ds_xl 1-GPU size; NC144lds (local-disk) $5.50, NC288ds (2 GPU) $11.00"},
     # ── CoreWeave ────────────────────────────────────────────────────────────
     "CoreWeave - A100 80GB":                {"provider": "CoreWeave", "gpu": "A100",  "cost_hr": 2.70,  "vram_gb": 80,  "notes": "8-GPU node, ~$21.60/hr total"},
     "CoreWeave - B200":                     {"provider": "CoreWeave", "gpu": "B200",  "cost_hr": 8.60,  "vram_gb": 192, "notes": "8-GPU node, ~$68.80/hr total"},
@@ -58,25 +62,25 @@ GPU_LIBRARY = {
     "Lambda - H100 SXM":                    {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 3.99,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
     # ── RunPod ───────────────────────────────────────────────────────────────
     "RunPod - A100 PCIe 80GB":              {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.39,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - A100 SXM 80GB":               {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.49,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - B200":                        {"provider": "RunPod",    "gpu": "B200",  "cost_hr": 5.89,  "vram_gb": 192, "notes": "Secure Cloud on-demand"},
-    "RunPod - B300":                        {"provider": "RunPod",    "gpu": "B300",  "cost_hr": 7.39,  "vram_gb": 288, "notes": "Secure Cloud on-demand"},
+    "RunPod - A100 SXM 80GB":               {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.59,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
+    "RunPod - B200":                        {"provider": "RunPod",    "gpu": "B200",  "cost_hr": 6.79,  "vram_gb": 192, "notes": "Secure Cloud on-demand"},
+    "RunPod - B300":                        {"provider": "RunPod",    "gpu": "B300",  "cost_hr": 7.89,  "vram_gb": 288, "notes": "Secure Cloud on-demand"},
     "RunPod - H100 NVL":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 3.19,  "vram_gb": 94,  "notes": "Secure Cloud on-demand"},
     "RunPod - H100 PCIe":                   {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 2.89,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - H100 SXM":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 2.99,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - H200 SXM":                    {"provider": "RunPod",    "gpu": "H200",  "cost_hr": 4.39,  "vram_gb": 141, "notes": "Secure Cloud on-demand"},
-    "RunPod - L4":                          {"provider": "RunPod",    "gpu": "L4",    "cost_hr": 0.39,  "vram_gb": 24,  "notes": "Secure Cloud on-demand"},
+    "RunPod - H100 SXM":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 3.29,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
+    "RunPod - H200 SXM":                    {"provider": "RunPod",    "gpu": "H200",  "cost_hr": 4.59,  "vram_gb": 141, "notes": "Secure Cloud on-demand"},
+    "RunPod - L4":                          {"provider": "RunPod",    "gpu": "L4",    "cost_hr": 0.49,  "vram_gb": 24,  "notes": "Secure Cloud on-demand"},
     "RunPod - L40S":                        {"provider": "RunPod",    "gpu": "L40S",  "cost_hr": 0.99,  "vram_gb": 48,  "notes": "Secure Cloud on-demand"},
-    "RunPod - RTX PRO 6000":                {"provider": "RunPod",    "gpu": "RTX PRO 6000", "cost_hr": 1.99, "vram_gb": 96, "notes": "Secure Cloud on-demand"},
+    "RunPod - RTX PRO 6000":                {"provider": "RunPod",    "gpu": "RTX PRO 6000", "cost_hr": 2.09, "vram_gb": 96, "notes": "Secure Cloud on-demand"},
     # ── Together AI ──────────────────────────────────────────────────────────
     "Together - B200":                      {"provider": "Together",  "gpu": "B200",  "cost_hr": 8.19,  "vram_gb": 192, "notes": "GPU cluster on-demand"},
     "Together - H100":                      {"provider": "Together",  "gpu": "H100",  "cost_hr": 3.99,  "vram_gb": 80,  "notes": "GPU cluster on-demand"},
     "Together - H200":                      {"provider": "Together",  "gpu": "H200",  "cost_hr": 5.99,  "vram_gb": 141, "notes": "GPU cluster on-demand"},
     # ── Vast.ai ──────────────────────────────────────────────────────────────
-    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.13,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=16)"},
-    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 6.69,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=25)"},
-    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 3.15,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=21)"},
-    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 4.21,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=7)"},
+    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.28,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=4, small pool)"},
+    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 7.01,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=8)"},
+    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 4.40,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=15, stable across 2 samples)"},
+    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 4.62,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=4, noisy)"},
     "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.33,  "vram_gb": 24,  "notes": "Marketplace median, verified hosts (n=7)"},
     "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.80,  "vram_gb": 48,  "notes": "Marketplace median, verified hosts (n=20)"},
     "Vast.ai - RTX PRO 6000":               {"provider": "Vast.ai",   "gpu": "RTX PRO 6000", "cost_hr": 1.60, "vram_gb": 96, "notes": "Marketplace median, Server Edition (n=27); WS variant $1.14"},

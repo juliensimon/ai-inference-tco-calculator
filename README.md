@@ -18,10 +18,10 @@ pinned: true
 How much does it *really* cost to run inference in production? This calculator compares the Total Cost of Ownership across three deployment options — API, self-hosted GPU, and local/edge — so you can make informed build-vs-buy decisions for your inference workloads.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Models-77-blue" alt="77 models">
-  <img src="https://img.shields.io/badge/GPU%20Instances-63-green" alt="63 GPU instances">
+  <img src="https://img.shields.io/badge/Models-88-blue" alt="88 models">
+  <img src="https://img.shields.io/badge/GPU%20Instances-67-green" alt="67 GPU instances">
   <img src="https://img.shields.io/badge/GPU%20Providers-9-orange" alt="9 providers">
-  <img src="https://img.shields.io/badge/Pricing-August%201%2C%202026-red" alt="August 1, 2026 pricing">
+  <img src="https://img.shields.io/badge/Pricing-August%2019%2C%202026-red" alt="August 19, 2026 pricing">
 </p>
 
 ## Inference Deployment Options Compared
@@ -34,9 +34,9 @@ How much does it *really* cost to run inference in production? This calculator c
 
 ## Features
 
-- **76 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
-- **63 GPU instances** for self-hosted inference across 9 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai)
-- **11 GPU types**: L4, L40S, A100, H100, H200, B200, B300, GB200, GH200, RTX PRO 6000, MI300X (NVIDIA + AMD)
+- **87 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
+- **67 GPU instances** for self-hosted inference across 9 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai)
+- **12 GPU types**: L4, L40S, A100, H100, H200, B200, B300, GB200, GH200, RTX PRO 4500, RTX PRO 6000, MI300X (NVIDIA + AMD)
 - **Smart routing** scenario (60/40 cheapest blend across inference providers)
 - **Break-even analysis** showing the daily request volume where self-hosted inference beats API
 - **Real-time calculations** — all charts and tables update as you adjust parameters
@@ -71,16 +71,16 @@ pytest test_app.py -v
 3. **Self-Hosted GPU** — Pick a cloud provider and GPU instance from the dropdowns, or enter custom pricing
 4. **Local / Edge** — Configure on-premises hardware parameters
 5. **Comparison** — View side-by-side annual costs, per-million-token costs, and break-even analysis
-6. **Model Library** — Browse all 77 models with current pricing
-7. **GPU Library** — Browse all 63 GPU instances with per-hour pricing across providers
+6. **Model Library** — Browse all 88 models with current pricing
+7. **GPU Library** — Browse all 67 GPU instances with per-hour pricing across providers
 
 ## Project Structure
 
 | File | Description |
 |------|-------------|
 | `app.py` | UI, calculations, charts, event wiring |
-| `models.py` | API model library (77 models with per-token pricing) |
-| `gpus.py` | GPU instance library (63 instances across 9 providers) |
+| `models.py` | API model library (88 models with per-token pricing) |
+| `gpus.py` | GPU instance library (67 instances across 9 providers) |
 | `test_app.py` | 90 unit tests covering helpers, calculations, and integration |
 | `SOURCES.md` | All pricing data sources for future updates |
 
