@@ -57,6 +57,7 @@ Last updated: August 19, 2026
 ## Notes
 
 - For multi-GPU nodes, per-GPU price = total node price / number of GPUs
+- **AWS is tracked at full instance-size granularity** (every size of p4d/p4de/p5/p5en/p6/g6/gr6/g6e/g7/g7e in us-east-1). Fractional-GPU families (g6f, gr6f — 1/8 to 1/2 of an L4) are excluded: a GPU slice does not fit the per-GPU cost schema. GPU counts per size verified against aws.amazon.com/ec2/instance-types/&lt;family&gt;.
 - Vast.ai prices are marketplace medians and fluctuate. Method: `GET console.vast.ai/api/v0/bundles/` with `q={"verified":{"eq":true},"rentable":{"eq":true},"gpu_name":{"eq":"<name>"}}`, then median of `dph_total / num_gpus`. Query **per GPU type** — the unfiltered endpoint caps at 64 offers regardless of `limit`. Sample size `n` is recorded in each entry's notes; restrict to verified hosts for reproducibility. Repeated queries can return HTTP 429 — back off and retry rather than accepting a partial sample.
 - **Vast.ai `A100 SXM4` mixes 40GB and 80GB cards.** Filter on `gpu_ram` or the median is a blend of two products. At the Aug 2026 refresh the blend was $0.84 while true 40GB was $0.80 and true 80GB was $1.13 — the library's old $0.80 "80GB" figure was in fact the blended/40GB number. Other GPU types in the library are VRAM-homogeneous.
 - **Vast.ai split `RTX PRO 6000` into `RTX PRO 6000 S` (Server Edition) and `RTX PRO 6000 WS` (Workstation)**; the bare name now returns zero offers. The library tracks the **S** variant, since AWS/Azure/GCP/CoreWeave/RunPod all list Server Edition.
