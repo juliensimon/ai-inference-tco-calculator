@@ -68,6 +68,7 @@ GPU_LIBRARY = {
     "CoreWeave - GH200":                    {"provider": "CoreWeave", "gpu": "GH200", "cost_hr": 6.50,  "vram_gb": 96,  "notes": "1-GPU instance"},
     "CoreWeave - H100 SXM":                 {"provider": "CoreWeave", "gpu": "H100",  "cost_hr": 6.16,  "vram_gb": 80,  "notes": "8-GPU node, ~$49.24/hr total"},
     "CoreWeave - H200":                     {"provider": "CoreWeave", "gpu": "H200",  "cost_hr": 6.31,  "vram_gb": 141, "notes": "8-GPU node, ~$50.44/hr total"},
+    "CoreWeave - L40":                      {"provider": "CoreWeave", "gpu": "L40",   "cost_hr": 1.25,  "vram_gb": 48,  "notes": "8-GPU node, ~$10.00/hr total"},
     "CoreWeave - L40S":                     {"provider": "CoreWeave", "gpu": "L40S",  "cost_hr": 2.25,  "vram_gb": 48,  "notes": "8-GPU node, ~$18.00/hr total"},
     "CoreWeave - RTX PRO 6000":             {"provider": "CoreWeave", "gpu": "RTX PRO 6000", "cost_hr": 2.50, "vram_gb": 96, "notes": "8-GPU node, ~$20.00/hr total"},
     # ── Crusoe ───────────────────────────────────────────────────────────────
