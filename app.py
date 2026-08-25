@@ -1,7 +1,7 @@
 """
 AI Inference TCO Calculator
 By Julien Simon | AI Operating Partner, Fortino Capital
-Pricing as of August 19, 2026
+Pricing as of August 25, 2026
 """
 
 import gradio as gr
@@ -13,7 +13,7 @@ from gpus import GPU_LIBRARY, GPU_PROVIDERS
 
 # Single source for every user-visible pricing date. Update this on a refresh —
 # it feeds the banner, both library tabs, and the GPU table label.
-PRICING_DATE = "August 19, 2026"
+PRICING_DATE = "August 25, 2026"
 
 # Default dropdown selections: current-generation premium / balanced / budget.
 # The price boxes below read from the library, so they cannot drift from the
@@ -991,7 +991,7 @@ def build_app():
 
             # ─────────────────── Tab 7: GPU Library ─────────────────
             with gr.Tab("GPU Library"):
-                gr.Markdown(f"### GPU Instance Library — {PRICING_DATE} Pricing\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** AWS us-east-1, GCP us-central1, Azure East US/East US 2, CoreWeave US-East, Crusoe us-north1, Lambda US, RunPod US, Together US, Vast.ai US (marketplace)", elem_classes="section-label")
+                gr.Markdown(f"### GPU Instance Library — {PRICING_DATE} Pricing\nPer-GPU on-demand hourly rates across major cloud providers\n\n**Regions:** AWS us-east-1, GCP us-central1, Azure East US/East US 2, CoreWeave US-East, Crusoe us-north1, Lambda US, RunPod US, Together US, Vast.ai global (marketplace)", elem_classes="section-label")
                 gpu_df = pd.DataFrame([
                     {"Instance": k, "Provider": v["provider"], "GPU": v["gpu"],
                      "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}
