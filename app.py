@@ -1,7 +1,7 @@
 """
 AI Inference TCO Calculator
 By Julien Simon | AI Operating Partner, Fortino Capital
-Pricing as of August 25, 2026
+Pricing as of September 3, 2026
 """
 
 import gradio as gr
@@ -13,7 +13,7 @@ from gpus import GPU_LIBRARY, GPU_PROVIDERS
 
 # Single source for every user-visible pricing date. Update this on a refresh —
 # it feeds the banner, both library tabs, and the GPU table label.
-PRICING_DATE = "August 25, 2026"
+PRICING_DATE = "September 3, 2026"
 
 # Default dropdown selections: current-generation premium / balanced / budget.
 # The price boxes below read from the library, so they cannot drift from the

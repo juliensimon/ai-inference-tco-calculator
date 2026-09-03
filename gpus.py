@@ -1,6 +1,6 @@
 """
 GPU Instance Library — per-GPU on-demand hourly pricing for inference
-Pricing as of August 25, 2026
+Pricing as of September 3, 2026
 
 Sources: aws.amazon.com, cloud.google.com, prices.azure.com,
          coreweave.com, crusoe.ai, lambda.ai, runpod.io,
@@ -9,14 +9,14 @@ Sources: aws.amazon.com, cloud.google.com, prices.azure.com,
 
 GPU_LIBRARY = {
     # ── AWS ──────────────────────────────────────────────────────────────────
-    "AWS - A100 40GB - p4d.24xlarge":       {"provider": "AWS",       "gpu": "A100",  "cost_hr": 2.75,  "vram_gb": 40,  "notes": "8-GPU node, ~$21.96/hr total"},
+    "AWS - A100 40GB - p4d.24xlarge":       {"provider": "AWS",       "gpu": "A100",  "cost_hr": 2.74,  "vram_gb": 40,  "notes": "8-GPU node, ~$21.96/hr total"},
     "AWS - A100 80GB - p4de.24xlarge":      {"provider": "AWS",       "gpu": "A100",  "cost_hr": 3.43,  "vram_gb": 80,  "notes": "8-GPU node, ~$27.45/hr total"},
     "AWS - B200 - p6-b200.48xlarge":        {"provider": "AWS",       "gpu": "B200",  "cost_hr": 14.24, "vram_gb": 192, "notes": "8-GPU node, ~$113.93/hr total"},
     "AWS - B300 - p6-b300.48xlarge":        {"provider": "AWS",       "gpu": "B300",  "cost_hr": 17.80, "vram_gb": 288, "notes": "8-GPU node, ~$142.42/hr total"},
     "AWS - H100 SXM - p5.4xlarge":          {"provider": "AWS",       "gpu": "H100",  "cost_hr": 6.88,  "vram_gb": 80,  "notes": "1-GPU instance"},
     "AWS - H100 SXM - p5.48xlarge":         {"provider": "AWS",       "gpu": "H100",  "cost_hr": 6.88,  "vram_gb": 80,  "notes": "8-GPU node, ~$55.04/hr total"},
     "AWS - H200 - p5en.48xlarge":           {"provider": "AWS",       "gpu": "H200",  "cost_hr": 7.91,  "vram_gb": 141, "notes": "8-GPU node, ~$63.30/hr total"},
-    "AWS - L4 - g6.xlarge":                 {"provider": "AWS",       "gpu": "L4",    "cost_hr": 0.81,  "vram_gb": 24,  "notes": "1-GPU instance"},
+    "AWS - L4 - g6.xlarge":                 {"provider": "AWS",       "gpu": "L4",    "cost_hr": 0.80,  "vram_gb": 24,  "notes": "1-GPU instance"},
     "AWS - L4 - g6.2xlarge":                {"provider": "AWS",       "gpu": "L4",    "cost_hr": 0.98,  "vram_gb": 24,  "notes": "1-GPU instance"},
     "AWS - L4 - g6.4xlarge":                {"provider": "AWS",       "gpu": "L4",    "cost_hr": 1.32,  "vram_gb": 24,  "notes": "1-GPU instance"},
     "AWS - L4 - g6.8xlarge":                {"provider": "AWS",       "gpu": "L4",    "cost_hr": 2.01,  "vram_gb": 24,  "notes": "1-GPU instance"},
@@ -127,13 +127,13 @@ GPU_LIBRARY = {
     "Together - H100":                      {"provider": "Together",  "gpu": "H100",  "cost_hr": 3.99,  "vram_gb": 80,  "notes": "GPU cluster on-demand"},
     "Together - H200":                      {"provider": "Together",  "gpu": "H200",  "cost_hr": 5.99,  "vram_gb": 141, "notes": "GPU cluster on-demand"},
     # ── Vast.ai ──────────────────────────────────────────────────────────────
-    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.16,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=10, 3 of 4 samples)"},
-    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 7.75,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=19, stable)"},
-    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 3.07,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=17, stable); US-only subset is ~4.77"},
-    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 4.08,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=13, stable)"},
+    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.10,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=5-6; 4 of 5 samples, one at 1.14)"},
+    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 6.01,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=6-7, bimodal ~6.00/~9.99; stable across 5 samples)"},
+    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 3.14,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=11-13, stable across 5 samples)"},
+    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 4.61,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=11, stable across 5 samples)"},
     "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.33,  "vram_gb": 24,  "notes": "Marketplace median, verified hosts (n=6); sits on the 0.335 rounding boundary"},
-    "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.80,  "vram_gb": 48,  "notes": "Marketplace median, verified hosts (n=6)"},
-    "Vast.ai - RTX PRO 6000":               {"provider": "Vast.ai",   "gpu": "RTX PRO 6000", "cost_hr": 1.52, "vram_gb": 96, "notes": "Marketplace median, Server Edition (n=20, stable across 5 samples)"},
+    "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.80,  "vram_gb": 48,  "notes": "Marketplace median, verified hosts (n=4)"},
+    "Vast.ai - RTX PRO 6000":               {"provider": "Vast.ai",   "gpu": "RTX PRO 6000", "cost_hr": 1.48, "vram_gb": 96, "notes": "Marketplace median, Server Edition (n=9-10, oscillating 1.47-1.49 across 5 samples)"},
 }
 
 GPU_PROVIDERS = sorted(set(v["provider"] for v in GPU_LIBRARY.values()))
