@@ -8,7 +8,7 @@ A model counts as available on a router if any catalog ID (any host or region)
 matches it. Matching is exact on a normalized name, plus the explicit ALIASES
 below for routers that use dated snapshot names. Exits with status 2 if a
 catalog cannot be fetched or looks truncated, so a failed fetch never wipes
-availability.
+availability, and with status 3 if a router in routers.py has no CATALOGS URL.
 """
 import json
 import pathlib
@@ -24,7 +24,8 @@ CATALOGS = {
     "Requesty":   "https://router.requesty.ai/v1/models",
     "Opper":      "https://opper.ai/models",           # HTML; the JSON API needs a key
 }
-MIN_IDS = 200   # a smaller catalog means the fetch or the page format broke
+MIN_IDS = 200      # a smaller catalog means the fetch or the page format broke
+MIN_MATCHES = 20   # fewer library models found means the IDs parsed are not model IDs
 
 # Router IDs whose name differs from the library name (dated snapshots, hosted variants)
 ALIASES = {
@@ -96,10 +97,16 @@ def render(avail):
 
 
 def main():
+    missing = [r for r in ROUTERS if r not in CATALOGS]
+    if missing:   # a config bug, not a fetch failure: exit 3, not 2
+        print(f"ERROR: no catalog URL in CATALOGS for {missing}", file=sys.stderr)
+        sys.exit(3)
+
     catalogs = {}
     for router in ROUTERS:
+        url = CATALOGS[router]
         try:
-            ids = catalog_ids(router, fetch(CATALOGS[router]))
+            ids = catalog_ids(router, fetch(url))
         except Exception as e:   # network, HTTP or JSON errors
             print(f"ERROR: could not fetch {router} catalog: {e}", file=sys.stderr)
             sys.exit(2)
@@ -110,6 +117,14 @@ def main():
         print(f"{router}: {len(ids)} catalog IDs")
 
     avail = availability(catalogs)
+    # A page redesign can leave MIN_IDS satisfied by nav or docs links
+    # (Opper is scraped HTML); too few library matches means the same breakage.
+    for router in ROUTERS:
+        matched = sum(router in r for r in avail.values())
+        if matched < MIN_MATCHES:
+            print(f"ERROR: only {matched} library models found on {router}", file=sys.stderr)
+            sys.exit(2)
+
     src = ROUTERS_PY.read_text()
     new_block = render(avail)
     start, end = src.index(BEGIN), src.index(END) + len(END)
@@ -120,7 +135,8 @@ def main():
         return
 
     from routers import ROUTER_AVAILABILITY as current
-    diffs = [(n, current.get(n), a) for n, a in avail.items() if current.get(n) != a]
+    diffs = [(n, current.get(n), avail.get(n)) for n in {**current, **avail}
+             if current.get(n) != avail.get(n)]   # includes keys of removed models
     for n, old, new in diffs:
         print(f"  {n}: {old} -> {new}")
     print(f"{len(diffs)} model(s) differ" if diffs else "Availability up to date")

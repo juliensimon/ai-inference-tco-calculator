@@ -7,10 +7,11 @@ Pricing as of September 25, 2026
 import gradio as gr
 import plotly.graph_objects as go
 import pandas as pd
+from urllib.parse import urlparse
 
 from models import MODEL_LIBRARY, API_MODELS
 from gpus import GPU_LIBRARY, GPU_PROVIDERS
-from routers import ROUTER_LIBRARY, ACCESS_CHOICES, ROUTERS, ROUTER_AVAILABILITY
+from routers import ROUTER_LIBRARY, ROUTERS, ROUTER_AVAILABILITY
 
 # Single source for every user-visible pricing date. Update this on a refresh —
 # it feeds the banner, both library tabs, and the GPU table label.
@@ -64,24 +65,58 @@ def _cards_row(*cards):
     return f'<div style="display:flex;gap:0.75rem;margin:0.75rem 0;flex-wrap:wrap">{"".join(cards)}</div>'
 
 
+def access_choices(model_name):
+    """Ways to buy a model: Direct (unless it has no first-party API) plus
+    every router that lists it. Unknown or unpriced models -> Direct only."""
+    m = MODEL_LIBRARY.get(model_name)
+    if not m or m["input"] is None:
+        return ["Direct"]
+    routes = [r for r in ROUTERS if r in ROUTER_AVAILABILITY.get(model_name, ())]
+    return (["Direct"] if m.get("direct", True) else []) + routes or ["Direct"]
+
+
+def resolve_access(model_name, access):
+    """The requested access if the model can be bought that way, else the
+    model's first valid option — so price and label never describe a route
+    that does not exist."""
+    choices = access_choices(model_name)
+    return access if access in choices else choices[0]
+
+
 def get_model_prices(model_name, access="Direct"):
     """Return (input_price, output_price) from model library, including the
-    fee of the router the model is bought through. Unknown access -> Direct."""
+    fee of the router the model is bought through (see resolve_access)."""
     if model_name and model_name in MODEL_LIBRARY:
         m = MODEL_LIBRARY[model_name]
         if m["input"] is not None:
-            fee = ROUTER_LIBRARY.get(access, ROUTER_LIBRARY["Direct"])["fee_pct"]
+            fee = ROUTER_LIBRARY[resolve_access(model_name, access)]["fee_pct"]
             mult = 1 + fee / 100
             return round(float(m["input"]) * mult, 6), round(float(m["output"]) * mult, 6)
     return 0.0, 0.0
 
 
+def update_access(model_name, access):
+    """Restrict an Access-via dropdown to the routes the model supports."""
+    choices = access_choices(model_name)
+    return gr.update(choices=choices, value=resolve_access(model_name, access))
+
+
 def slot_name(model_name, access, default):
     """Column label for an API slot, e.g. 'GPT-6 Sol via Requesty'."""
-    name = model_name or default
-    if access and access != "Direct" and access in ROUTER_LIBRARY:
-        return f"{name} via {access}"
-    return name
+    if not model_name:
+        return default
+    access = resolve_access(model_name, access)
+    return model_name if access == "Direct" else f"{model_name} via {access}"
+
+
+def gpu_price_hint(gpus=("H100", "H200", "B200")):
+    """Per-GPU hourly price ranges from the library, e.g. 'H100: $2.89-$12.29'."""
+    parts = []
+    for gpu in gpus:
+        prices = [g["cost_hr"] for g in GPU_LIBRARY.values() if g["gpu"] == gpu]
+        if prices:
+            parts.append(f"{gpu}: ${min(prices):.2f}-${max(prices):.2f}")
+    return ", ".join(parts)
 
 
 def get_gpu_instances(provider):
@@ -115,13 +150,14 @@ def calc_usage(input_tpr, output_tpr, req_day, days_year):
     }
 
 
-def calc_api(name, in_price, out_price, in_year_M, out_year_M, req_day, days_year):
+def calc_api(name, in_price, out_price, in_year_M, out_year_M, req_day, days_year, model=None):
     a_in = in_year_M * in_price
     a_out = out_year_M * out_price
     total = a_in + a_out
     total_req = req_day * days_year
     return {
         "name": name,
+        "model": model,
         "in_price": in_price,
         "out_price": out_price,
         "in_M": in_year_M,
@@ -135,11 +171,18 @@ def calc_api(name, in_price, out_price, in_year_M, out_year_M, req_day, days_yea
 
 
 def calc_smart_routing(providers):
-    """60% cheapest, 40% 2nd cheapest among non-zero providers."""
-    valid = [p for p in providers if p["total"] > 0]
+    """60% cheapest, 40% 2nd cheapest among non-zero providers. A model
+    selected in several slots (e.g. direct and via a router) counts once, at
+    its cheapest price: routing traffic to its own fee-marked copy is not a
+    routing strategy."""
+    valid, seen = [], set()
+    for p in sorted(providers, key=lambda x: x["total"]):
+        if p["total"] <= 0 or (p.get("model") is not None and p["model"] in seen):
+            continue
+        seen.add(p.get("model"))
+        valid.append(p)
     if not valid:
         return {"annual": 0, "monthly": 0, "savings": 0}
-    valid.sort(key=lambda x: x["total"])
     if len(valid) == 1:
         blended = valid[0]["total"]
     else:
@@ -209,7 +252,7 @@ CHART_LAYOUT = dict(
 
 
 def chart_api(providers):
-    names = [p["name"] for p in providers]
+    names = [p["col"] for p in providers]   # deduplicated, as in the table
     fig = go.Figure(data=[
         go.Bar(
             name="Input Cost", x=names,
@@ -319,10 +362,12 @@ def master_update(
     sh_sw_cost = sf(sh_sw_cost, 2000)
     sh_net_cost = sf(sh_net_cost, 3000)
     hw_cost = sf(hw_cost, 1999)
-    num_dev = sf(num_dev, 1)
+    num_dev = sf(num_dev, 2)
     watts = sf(watts, 575)
     elec_rate = sf(elec_rate, 0.12)
-    hw_life = max(sf(hw_life, 3), 1)
+    hw_life = sf(hw_life, 3)
+    if hw_life <= 0:   # not a lifetime: fall back to the default, as for blank input
+        hw_life = 3
     local_util = sf(local_util, 70)
     local_hours = sf(local_hours, 24)
     local_throughput = sf(local_throughput, 100)
@@ -345,24 +390,27 @@ def master_update(
 
     # ── API providers ──
     p1 = calc_api(slot_name(model_1, access_1, "Provider 1"), price_in_1, price_out_1,
-                  u["input_year_M"], u["output_year_M"], req_day, days_year)
+                  u["input_year_M"], u["output_year_M"], req_day, days_year, model_1)
     p2 = calc_api(slot_name(model_2, access_2, "Provider 2"), price_in_2, price_out_2,
-                  u["input_year_M"], u["output_year_M"], req_day, days_year)
+                  u["input_year_M"], u["output_year_M"], req_day, days_year, model_2)
     p3 = calc_api(slot_name(model_3, access_3, "Provider 3"), price_in_3, price_out_3,
-                  u["input_year_M"], u["output_year_M"], req_day, days_year)
+                  u["input_year_M"], u["output_year_M"], req_day, days_year, model_3)
     p4 = calc_api(model_4_name or "Custom Provider", price_in_4, price_out_4,
                   u["input_year_M"], u["output_year_M"], req_day, days_year)
     provs = [p1, p2, p3, p4]
+    # A slot with no price (unconfigured Provider 4, a model with no per-token
+    # price) is not a $0 offer: leave it out of the table and chart.
+    shown = [p for p in provs if p["in_price"] or p["out_price"]] or provs
 
-    # Deduplicate provider names for DataFrame columns
-    seen = {}
+    # Deduplicate provider names for DataFrame columns ("Metric" is taken)
+    used = {"Metric"}
     for p in provs:
-        n = p["name"]
-        seen[n] = seen.get(n, 0) + 1
-        if seen[n] > 1:
-            p["col"] = f"{n} ({seen[n]})"
-        else:
-            p["col"] = n
+        col, k = p["name"], 1
+        while col in used:   # a custom name can itself look like "X (2)"
+            k += 1
+            col = f"{p['name']} ({k})"
+        used.add(col)
+        p["col"] = col
 
     # API cost table
     def api_col(p):
@@ -382,10 +430,7 @@ def master_update(
             "Total annual cost ($)", "Monthly cost ($)",
             "Cost per 1K requests ($)",
         ],
-        p1["col"]: api_col(p1),
-        p2["col"]: api_col(p2),
-        p3["col"]: api_col(p3),
-        p4["col"]: api_col(p4),
+        **{p["col"]: api_col(p) for p in shown},
     })
 
     # Smart routing
@@ -394,7 +439,7 @@ def master_update(
         '<div style="margin-top:1.25rem">'
         '<div style="font-size:0.95rem;font-weight:600;margin-bottom:0.15rem">Smart Routing Scenario</div>'
         '<div style="font-size:0.82rem;opacity:0.6;margin-bottom:0.75rem">'
-        'Route 60% to cheapest provider, 40% to 2nd cheapest (across all 4)</div>'
+        'Route 60% to cheapest provider, 40% to 2nd cheapest (across all 4; a model picked twice counts once)</div>'
         + _cards_row(
             _card("Blended Annual Cost", fmt_c(sr["annual"]), "highlight"),
             _card("Monthly Blended", fmt_c(sr["monthly"])),
@@ -403,7 +448,7 @@ def master_update(
         + '</div>'
     )
 
-    api_fig = chart_api(provs)
+    api_fig = chart_api(shown)
 
     # ── Self-hosted GPU ──
     sh = calc_self_hosted(
@@ -538,42 +583,56 @@ def master_update(
         "Local / Edge": le["cost_per_M"],
     }
 
+    # Fixed-capacity options that cannot carry the workload are not options:
+    # their cost is for serving only part of it.
+    def serves(headroom):
+        return "Yes" if headroom >= 0 else f"No ({fmt_p(-headroom, 0)} short)"
+    capacity = {
+        "API (Best Single)": "Yes", "API (Smart Routing)": "Yes",
+        "Self-Hosted GPU": serves(sh["headroom"]), "Local / Edge": serves(le["headroom"]),
+    }
+
+    def per_M(k):
+        return fmt_c(cpm[k], 2) if capacity[k] == "Yes" else "N/A (over capacity)"
+
     comp_df = pd.DataFrame({
         "Metric": [
             "Annual total cost ($)", "Monthly cost ($)", "Cost per 1M tokens ($)",
+            "Serves the workload?",
             "Data leaves your network?", "ML team required?",
             "Scales with volume?", "EU AI Act compliant?", "Time to deploy",
         ],
         "API (Best Single)": [
             fmt_c(best_api_annual), fmt_c(best_api["monthly"]),
-            fmt_c(cpm["API (Best Single)"], 2),
+            fmt_c(cpm["API (Best Single)"], 2), capacity["API (Best Single)"],
             "Yes", "No", "Linear cost increase",
             "Depends on vendor DPA", "Days",
         ],
         "API (Smart Routing)": [
             fmt_c(sr["annual"]), fmt_c(sr["monthly"]),
-            fmt_c(cpm["API (Smart Routing)"], 2),
+            fmt_c(cpm["API (Smart Routing)"], 2), capacity["API (Smart Routing)"],
             "Yes", "No", "Linear cost increase",
             "Depends on vendor DPA", "Days",
         ],
         "Self-Hosted GPU": [
             fmt_c(sh["total"]), fmt_c(sh["monthly"]),
-            fmt_c(sh["cost_per_M"], 2),
+            per_M("Self-Hosted GPU"), capacity["Self-Hosted GPU"],
             "No (your cloud VPC)", "Yes", "Fixed cost (to capacity)",
             "Full control", "Weeks",
         ],
         "Local / Edge": [
             fmt_c(le["total"]), fmt_c(le["monthly"]),
-            fmt_c(le["cost_per_M"], 2),
+            per_M("Local / Edge"), capacity["Local / Edge"],
             "No (fully local)", "Minimal", "Fixed cost (to capacity)",
             "Full control", "Days to weeks",
         ],
     })
 
-    # Lowest cost option
-    lowest_name = min(options, key=options.get)
-    lowest_val = options[lowest_name]
-    highest_val = max(options.values())
+    # Lowest cost option, among options that can serve the workload
+    viable = {k: v for k, v in options.items() if capacity[k] == "Yes"}
+    lowest_name = min(viable, key=viable.get)
+    lowest_val = viable[lowest_name]
+    highest_val = max(viable.values())
     savings_val = highest_val - lowest_val
     savings_pct = savings_val / highest_val if highest_val > 0 else 0
 
@@ -586,7 +645,7 @@ def master_update(
         # configured GPUs can actually serve. Say so rather than presenting an
         # unreachable volume as a target.
         tok_per_req = input_tpr + output_tpr
-        if sh["max_tok"] > 0 and be_req_day * tok_per_req > sh["max_tok"]:
+        if be_req_day * tok_per_req > sh["max_tok"] or sh["headroom"] < 0:
             breakeven = f"{fmt_n(be_req_day)} req/day (over capacity)"
         elif be_req_day <= req_day:
             breakeven = f"{fmt_n(be_req_day)} req/day"
@@ -620,12 +679,12 @@ def master_update(
         )
     )
 
-    cats = list(options.keys())
+    cats = list(viable)   # over-capacity options would plot as falsely cheap
     comp_annual_fig = chart_comparison_bars(
-        cats, list(options.values()), "Annual Cost Comparison"
+        cats, [options[k] for k in cats], "Annual Cost Comparison"
     )
     comp_per_M_fig = chart_comparison_bars(
-        cats, list(cpm.values()), "Cost per 1M Tokens"
+        cats, [cpm[k] for k in cats], "Cost per 1M Tokens"
     )
 
     return (
@@ -846,7 +905,7 @@ def build_app():
                             label="Provider 1: Model",
                             )
                         access_1 = gr.Dropdown(
-                            choices=ACCESS_CHOICES, value="Direct",
+                            choices=access_choices(DEFAULT_MODELS[0]), value="Direct",
                             label="Provider 1: Access via")
                         price_in_1 = gr.Number(
                             value=get_model_prices(DEFAULT_MODELS[0])[0],
@@ -859,7 +918,7 @@ def build_app():
                             choices=API_MODELS, value=DEFAULT_MODELS[1],
                             label="Provider 2: Model")
                         access_2 = gr.Dropdown(
-                            choices=ACCESS_CHOICES, value="Direct",
+                            choices=access_choices(DEFAULT_MODELS[1]), value="Direct",
                             label="Provider 2: Access via")
                         price_in_2 = gr.Number(
                             value=get_model_prices(DEFAULT_MODELS[1])[0],
@@ -872,7 +931,7 @@ def build_app():
                             choices=API_MODELS, value=DEFAULT_MODELS[2],
                             label="Provider 3: Model")
                         access_3 = gr.Dropdown(
-                            choices=ACCESS_CHOICES, value="Direct",
+                            choices=access_choices(DEFAULT_MODELS[2]), value="Direct",
                             label="Provider 3: Access via")
                         price_in_3 = gr.Number(
                             value=get_model_prices(DEFAULT_MODELS[2])[0],
@@ -885,10 +944,10 @@ def build_app():
                             value="Custom Provider",
                             label="Provider 4: Name (custom)",
                             info="e.g., Together.ai, Groq, Fireworks")
-                        price_in_4 = gr.Number(
-                            value=0.5, label="Provider 4: Input $ / 1M tokens")
+                        price_in_4 = gr.Number(   # 0 = not configured, left out of comparisons
+                            value=0, label="Provider 4: Input $ / 1M tokens")
                         price_out_4 = gr.Number(
-                            value=1.5, label="Provider 4: Output $ / 1M tokens")
+                            value=0, label="Provider 4: Output $ / 1M tokens")
 
                 gr.Markdown("---")
                 gr.Markdown("### Self-Hosted GPU Parameters\nCloud GPU rental with your own inference stack", elem_classes="section-label")
@@ -907,11 +966,11 @@ def build_app():
                     )
                     gpu_cost_hr = gr.Number(
                         value=2.5, label="GPU cost / hour ($)",
-                        info="H100: $1.49-$3.90, H200: $2.50-$4.31, B200: $3.75-$5.87")
+                        info=gpu_price_hint())
                 with gr.Row():
                     num_gpus = gr.Number(
-                        value=1, label="Number of instances",
-                        info="7B model: 1 GPU. 70B model: 2-4 GPUs")
+                        value=1, label="Number of GPUs",
+                        info="Prices are per GPU (a p5.48xlarge is 8). 7B model: 1 GPU. 70B model: 2-4 GPUs")
                     gpu_util = gr.Slider(
                         minimum=0, maximum=100, value=70, step=5,
                         label="GPU utilization (%)",
@@ -937,7 +996,8 @@ def build_app():
                         value=1999, label="Hardware purchase cost ($)",
                         info="One-time CapEx. RTX 5090: $1,999")
                     num_dev = gr.Number(
-                        value=1, label="Number of devices")
+                        value=2, label="Number of devices",
+                        info="2 x 100 tok/s at 70% covers the default 7M tok/day")
                     watts = gr.Number(
                         value=575, label="Power consumption (W / device)",
                         info="RTX 5090: 575W, M4 Max: ~60W")
@@ -997,7 +1057,9 @@ def build_app():
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
                 gr.Markdown(f"### Model Library — {PRICING_DATE} Pricing\nSources: [openai.com](https://developers.openai.com/api/docs/pricing), [platform.claude.com](https://platform.claude.com/docs/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [docs.x.ai](https://docs.x.ai/docs/models), [api-docs.deepseek.com](https://api-docs.deepseek.com/quick_start/pricing), [mistral.ai](https://mistral.ai/pricing/api/), [alibabacloud.com](https://www.alibabacloud.com/help/en/model-studio/model-pricing), [platform.kimi.ai](https://platform.kimi.ai/docs/pricing), [docs.z.ai](https://docs.z.ai/guides/overview/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
-                gr.Markdown("#### Routers and gateways\nRouters pass provider token prices through and add a fee. Pick one per provider with *Access via* on the Inputs tab. Sources: [openrouter.ai](https://openrouter.ai/docs/faq), [requesty.ai](https://www.requesty.ai/pricing), [opper.ai](https://opper.ai/pricing)")
+                gr.Markdown("#### Routers and gateways\nRouters pass provider token prices through and add a fee. Pick one per provider with *Access via* on the Inputs tab. Models without a first-party API are priced from OpenRouter hosts and can only be bought via a router. Sources: "
+                            + ", ".join(f"[{urlparse(r['source']).netloc.removeprefix('www.')}]({r['source']})"
+                                        for r in ROUTER_LIBRARY.values() if r["source"]))
                 router_df = pd.DataFrame(
                     [[name, f"{r['fee_pct']:g}%", r["fee_basis"], r["byok"], r["notes"]]
                      for name, r in ROUTER_LIBRARY.items() if name != "Direct"],
@@ -1060,27 +1122,29 @@ def build_app():
             (model_2, access_2, price_in_2, price_out_2),
             (model_3, access_3, price_in_3, price_out_3),
         ]:
-            for trigger in (dd, acc):
-                trigger.change(
-                    fn=get_model_prices, inputs=[dd, acc], outputs=[pi, po],
-                ).then(
-                    fn=master_update, inputs=all_inputs, outputs=all_outputs,
-                )
+            # A new model may not be sold via the current route: fix the
+            # route first so the price below is computed for a real one.
+            dd.change(
+                fn=update_access, inputs=[dd, acc], outputs=[acc],
+            ).then(
+                fn=get_model_prices, inputs=[dd, acc], outputs=[pi, po],
+            ).then(
+                fn=master_update, inputs=all_inputs, outputs=all_outputs,
+            )
+            acc.change(
+                fn=get_model_prices, inputs=[dd, acc], outputs=[pi, po],
+            ).then(
+                fn=master_update, inputs=all_inputs, outputs=all_outputs,
+            )
 
-        # GPU provider → update instance list → update price → recalculate
+        # GPU provider → instance list → instance.change sets the cost →
+        # gpu_cost_hr.change (in change_inputs) recalculates. One recalculation
+        # per click; chaining master_update here too ran it up to four times.
         gpu_provider.change(
             fn=get_gpu_instances, inputs=[gpu_provider], outputs=[gpu_instance],
-        ).then(
-            fn=get_gpu_price, inputs=[gpu_instance], outputs=[gpu_cost_hr],
-        ).then(
-            fn=master_update, inputs=all_inputs, outputs=all_outputs,
         )
-
-        # GPU instance dropdown: auto-populate cost, then recalculate
         gpu_instance.change(
             fn=get_gpu_price, inputs=[gpu_instance], outputs=[gpu_cost_hr],
-        ).then(
-            fn=master_update, inputs=all_inputs, outputs=all_outputs,
         )
 
         # All non-dropdown inputs trigger recalculation

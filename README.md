@@ -61,7 +61,7 @@ python app.py
 ### Run Tests
 
 ```bash
-pip install pytest
+pip install -r requirements.txt pytest
 pytest test_app.py -v
 ```
 
@@ -84,7 +84,7 @@ pytest test_app.py -v
 | `routers.py` | Router fees and generated per-model router availability |
 | `check_router_catalogs.py` | Refreshes router availability from the OpenRouter, Requesty and Opper catalogs |
 | `gpus.py` | GPU instance library (118 instances across 9 providers) |
-| `test_app.py` | 90 unit tests covering helpers, calculations, and integration |
+| `test_app.py` | 123 unit tests covering helpers, calculations, and integration |
 | `SOURCES.md` | All pricing data sources for future updates |
 
 ## Data Sources

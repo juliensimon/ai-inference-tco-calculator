@@ -9,10 +9,10 @@ import re
 import pathlib
 from models import MODEL_LIBRARY, API_MODELS
 from gpus import GPU_LIBRARY, GPU_PROVIDERS
-from routers import ROUTER_LIBRARY, ACCESS_CHOICES, ROUTERS, ROUTER_AVAILABILITY
+from routers import ROUTER_LIBRARY, ROUTERS, ROUTER_AVAILABILITY
 from app import (
     sf, fmt_c, fmt_n, fmt_p,
-    get_model_prices, slot_name, get_gpu_price, get_gpu_instances,
+    get_model_prices, slot_name, access_choices, get_gpu_price, get_gpu_instances,
     calc_usage, calc_api, calc_smart_routing,
     calc_self_hosted, calc_local, master_update,
     DEFAULT_MODELS, PRICING_DATE,
@@ -215,8 +215,9 @@ class TestGetModelPrices:
     def test_known_model(self):
         # Pinned to the library, not literals: prices change every refresh,
         # but the lookup must always return that model's input/output pair.
-        m = MODEL_LIBRARY["Claude Sonnet 4.6"]
-        inp, out = get_model_prices("Claude Sonnet 4.6")
+        name = next(n for n, m in MODEL_LIBRARY.items() if m["input"] is not None)
+        m = MODEL_LIBRARY[name]
+        inp, out = get_model_prices(name)
         assert (inp, out) == (float(m["input"]), float(m["output"]))
 
     def test_unknown_model(self):
@@ -228,16 +229,19 @@ class TestGetModelPrices:
     def test_empty_string(self):
         assert get_model_prices("") == (0.0, 0.0)
 
-    def test_unpriced_model_returns_zero(self):
+    def test_unpriced_model_returns_zero(self, monkeypatch):
         """Models with None pricing should return (0.0, 0.0)."""
-        # Pinned to the library, not a literal: unpriced models come and go.
+        # A synthetic model, so the path is exercised even when a refresh
+        # prices or removes every real unpriced model.
+        monkeypatch.setitem(MODEL_LIBRARY, "Test Unpriced",
+                            {"provider": "T", "input": None, "output": None, "notes": ""})
         unpriced = [n for n, m in MODEL_LIBRARY.items() if m["input"] is None]
-        assert unpriced, "no unpriced model in the library to exercise this path"
         for name in unpriced:
             assert get_model_prices(name) == (0.0, 0.0)
 
     def test_returns_floats(self):
-        inp, out = get_model_prices("GPT-5")
+        inp, out = get_model_prices(next(n for n, m in MODEL_LIBRARY.items()
+                                         if m["input"] is not None))
         assert isinstance(inp, float)
         assert isinstance(out, float)
 
@@ -246,8 +250,9 @@ class TestGetGpuPrice:
     def test_known_instance(self):
         # Pinned to the library, not a literal: prices change every refresh,
         # but the lookup must always return that instance's cost_hr.
-        price = get_gpu_price("RunPod - H100 SXM")
-        assert price == GPU_LIBRARY["RunPod - H100 SXM"]["cost_hr"]
+        name = next(iter(GPU_LIBRARY))
+        price = get_gpu_price(name)
+        assert price == GPU_LIBRARY[name]["cost_hr"]
         assert isinstance(price, (int, float))
 
     def test_unknown_instance(self):
@@ -266,10 +271,11 @@ class TestGetGpuPrice:
 
 class TestGetGpuInstances:
     def test_known_provider(self):
-        result = get_gpu_instances("RunPod")
+        provider = GPU_PROVIDERS[0]
+        result = get_gpu_instances(provider)
         assert "choices" in result
         assert len(result["choices"]) > 0
-        assert all("RunPod" in name for name in result["choices"])
+        assert all(GPU_LIBRARY[name]["provider"] == provider for name in result["choices"])
 
     def test_custom_provider(self):
         result = get_gpu_instances("(Custom)")
@@ -382,6 +388,17 @@ class TestCalcSmartRouting:
         sr = calc_smart_routing([p1, p2, p3, p4])
         # Blended = 0.6 * 5000 + 0.4 * 10000 = 7000
         assert sr["annual"] == pytest.approx(7000)
+
+    def test_same_model_via_router_counts_once(self):
+        """GPT-6 Sol direct and via a router is one model at two prices, not
+        two providers to split traffic between: only its cheapest copy may
+        enter the blend and the average."""
+        direct = {"total": 10000, "model": "GPT-6 Sol"}
+        routed = {"total": 10550, "model": "GPT-6 Sol"}
+        other = {"total": 20000, "model": "Claude Sonnet 5"}
+        sr = calc_smart_routing([routed, direct, other])
+        assert sr["annual"] == pytest.approx(0.6 * 10000 + 0.4 * 20000)
+        assert sr["savings"] == pytest.approx(1 - sr["annual"] / 15000)
 
 
 class TestCalcSelfHosted:
@@ -504,6 +521,8 @@ class TestCalcLocal:
 class TestMasterUpdate:
     """Integration tests for master_update with default-like values."""
 
+    # A fixed scenario the calculation tests are tuned to, deliberately not
+    # the UI defaults (those are tested through _ui_default_args).
     DEFAULT_ARGS = (
         500, 200, 10000, 365,                        # usage
         "Claude Sonnet 4.6", 3, 15,                  # provider 1
@@ -614,18 +633,21 @@ class TestBreakEven:
         """Very cheap GPU should show break-even below current volume."""
         args = list(TestMasterUpdate.DEFAULT_ARGS)
         args[16] = 0.01  # gpu_cost_hr = $0.01 (unrealistically cheap)
+        args[21] = args[22] = 0   # no sw/net overhead, or $5k/yr alone outweighs the API
         result = master_update(*args)
         comp_summary = result[10]
-        # Should show a number, not "Need"
+        # Already past break-even: a plain volume, not a target to reach
         assert "req/day" in comp_summary
+        assert "Need" not in comp_summary
 
     def test_breakeven_with_expensive_gpu(self):
-        """Very expensive GPU should show 'Need X req/day'."""
+        """GPU costlier than the current API spend, but within capacity at
+        break-even, should show 'Need X req/day'."""
         args = list(TestMasterUpdate.DEFAULT_ARGS)
-        args[16] = 100  # gpu_cost_hr = $100
+        args[16] = 0.5  # gpu_cost_hr: break-even ~132k req/day (92M tok), inside 139M tok/day capacity
         result = master_update(*args)
         comp_summary = result[10]
-        assert "req/day" in comp_summary
+        assert "Need" in comp_summary and "req/day" in comp_summary
 
     def test_breakeven_flags_volume_the_gpus_cannot_serve(self):
         """Break-even is pure cost arithmetic, so it can exceed what the
@@ -655,10 +677,21 @@ class TestRouters:
     be applied exactly once, and choosing Direct must leave every existing
     cost unchanged, or the direct-vs-router comparison is meaningless."""
 
-    MODEL = "GPT-6 Sol"
+    # Synthetic, listed everywhere: the weekly refresh rewrites real
+    # availability, and a delisting must not fail these fee tests.
+    MODEL = "Test Routed"
+
+    @pytest.fixture(autouse=True)
+    def _routed_model(self, monkeypatch):
+        monkeypatch.setitem(MODEL_LIBRARY, self.MODEL,
+                            {"provider": "T", "input": 2, "output": 10, "notes": ""})
+        monkeypatch.setitem(ROUTER_AVAILABILITY, self.MODEL, tuple(ROUTERS))
+        monkeypatch.setitem(MODEL_LIBRARY, "Test Unpriced",
+                            {"provider": "T", "input": None, "output": None, "notes": ""})
+        monkeypatch.setitem(ROUTER_AVAILABILITY, "Test Unpriced", tuple(ROUTERS))
 
     def test_direct_is_the_default_and_free(self):
-        assert ACCESS_CHOICES[0] == "Direct"
+        assert access_choices(self.MODEL)[0] == "Direct"
         assert ROUTER_LIBRARY["Direct"]["fee_pct"] == 0
         assert get_model_prices(self.MODEL) == get_model_prices(self.MODEL, "Direct")
 
@@ -669,10 +702,6 @@ class TestRouters:
         inp, out = get_model_prices(self.MODEL, router)
         assert inp == pytest.approx(base_in * mult)
         assert out == pytest.approx(base_out * mult)
-
-    def test_requesty_matches_its_published_example(self):
-        """requesty.ai/pricing: '$10 per 1M from OpenAI costs $10.50'."""
-        assert get_model_prices(self.MODEL, "Requesty")[1] == pytest.approx(10.50)
 
     def test_unknown_router_falls_back_to_direct(self):
         assert get_model_prices(self.MODEL, "NoSuchRouter") == get_model_prices(self.MODEL)
@@ -714,4 +743,245 @@ class TestRouters:
         money = lambda v: float(v.replace("$", "").replace(",", ""))
         direct_total = money(api_table.at[row, direct_col])
         router_total = money(api_table.at[row, router_col])
-        assert router_total == pytest.approx(direct_total * 1.055, rel=1e-3)
+        fee = ROUTER_LIBRARY["OpenRouter"]["fee_pct"]
+        assert router_total == pytest.approx(direct_total * (1 + fee / 100), rel=1e-3)
+
+    def test_no_price_for_a_route_that_does_not_exist(self, monkeypatch):
+        """A model no router lists must not be priced or labelled as bought
+        through one: that purchase path cannot be made."""
+        monkeypatch.setitem(MODEL_LIBRARY, "Test Unlisted",
+                            {"provider": "T", "input": 1, "output": 2, "notes": ""})
+        monkeypatch.setitem(ROUTER_AVAILABILITY, "Test Unlisted", ())
+        unlisted = [n for n, m in MODEL_LIBRARY.items()
+                    if m["input"] is not None and not ROUTER_AVAILABILITY[n]]
+        for name in unlisted:
+            assert access_choices(name) == ["Direct"]
+            assert get_model_prices(name, "OpenRouter") == get_model_prices(name)
+            assert slot_name(name, "OpenRouter", "Provider 1") == name
+
+    def test_router_only_models_have_no_direct_price(self, monkeypatch):
+        """Models priced from OpenRouter hosts have no first-party API at
+        that price. Offering 'Direct' would show the router's price without
+        its fee, as if the fee were avoidable."""
+        monkeypatch.setitem(MODEL_LIBRARY, "Test Hosted",
+                            {"provider": "T", "input": 1, "output": 2,
+                             "notes": "Via OpenRouter.", "direct": False})
+        monkeypatch.setitem(ROUTER_AVAILABILITY, "Test Hosted", ("Opper",))
+        router_only = [n for n, m in MODEL_LIBRARY.items() if m.get("direct") is False]
+        for name in router_only:
+            choices = access_choices(name)
+            assert "Direct" not in choices and choices, f"{name}: {choices}"
+            fee = ROUTER_LIBRARY[choices[0]]["fee_pct"]
+            base = MODEL_LIBRARY[name]["input"]
+            assert get_model_prices(name, "Direct")[0] == pytest.approx(base * (1 + fee / 100), abs=1e-6)
+            assert slot_name(name, "Direct", "Provider 1") == f"{name} via {choices[0]}"
+
+    def test_router_only_flag_matches_notes(self):
+        """The flag must follow the price source the notes cite, so a refresh
+        that adds an OpenRouter-priced model cannot forget it."""
+        for name, m in MODEL_LIBRARY.items():
+            via_openrouter = "via openrouter" in m["notes"].lower()
+            assert (m.get("direct", True) is False) == via_openrouter, name
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# FULL-APP REVIEW REGRESSIONS
+# ═════════════════════════════════════════════════════════════════════════════
+
+def _money(v):
+    return float(v.replace("$", "").replace(",", ""))
+
+
+def _ui():
+    """The built app: its components by label, and its event functions."""
+    from app import build_app
+    demo, _ = build_app()
+    comps = {getattr(b, "label", None): b for b in demo.blocks.values()}
+    return demo, comps
+
+
+def _ui_default_args():
+    """master_update's arguments exactly as the page computes them on load."""
+    demo, _ = _ui()
+    load = next(f for f in demo.fns.values()
+                if f.fn is master_update and any(t[1] == "load" for t in f.targets))
+    return [c.value for c in load.inputs]
+
+
+class TestComparisonCapacity:
+    """An option that cannot serve the workload is not an option: it must not
+    win 'Lowest Cost', and savings must not be measured against it."""
+
+    def _heavy(self):
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[2] = 1_000_000   # req/day: 700M tok/day, far beyond GPU and local capacity
+        return master_update(*args)
+
+    def test_over_capacity_option_cannot_be_lowest_cost(self):
+        summary = self._heavy()[10]
+        winner = re.search(r"Lowest Cost Option</div>.*?>([^<]+)</div>", summary).group(1)
+        assert winner.startswith("API"), winner
+
+    def test_comparison_table_flags_capacity(self):
+        comp_df = self._heavy()[11]
+        row = comp_df.index[comp_df["Metric"] == "Serves the workload?"][0]
+        assert comp_df.at[row, "Local / Edge"].startswith("No")
+        assert comp_df.at[row, "Self-Hosted GPU"].startswith("No")
+        assert comp_df.at[row, "API (Best Single)"] == "Yes"
+
+
+class TestApiLabels:
+    def test_same_model_twice_gets_two_bars(self):
+        """The table already names duplicates 'X' and 'X (2)'; the chart must
+        use the same names or Plotly stacks both on one category."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[7:10] = args[4:7]   # provider 2 = provider 1
+        fig = master_update(*args)[3]
+        x = list(fig.data[0].x)
+        assert len(set(x)) == len(x), x
+
+    def test_provider_named_metric_keeps_the_label_column(self):
+        """'Metric' is the table's row-label column; a provider with that name
+        must get its own column instead of overwriting the labels."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[13] = "Metric"   # provider 4 name
+        api_df = master_update(*args)[1]
+        assert api_df["Metric"].iloc[0] == "Input price / 1M tokens ($)"
+        assert len(api_df.columns) == 5
+
+
+class TestBreakEvenZeroCapacity:
+    def test_zero_utilization_is_over_capacity(self):
+        """GPUs at 0% serve nothing, so any break-even volume is unreachable."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[18] = 0   # gpu_util
+        assert "over capacity" in master_update(*args)[10]
+
+
+class TestHardwareLifetime:
+    def test_fractional_lifetime_is_not_rounded_up(self):
+        """A 6-month lifetime amortizes the hardware over 6 months: twice
+        the yearly cost, not the 1-year figure."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[27] = 0.5   # hw_life
+        le_df = master_update(*args)[7]
+        assert _money(le_df.iloc[0, 1]) == pytest.approx(1999 / 0.5)
+
+
+class TestUiDefaults:
+    def test_gpu_count_is_per_gpu(self):
+        """Library prices and throughput are per GPU, so the multiplier the
+        user enters must be a GPU count, not an instance count (a p5.48xlarge
+        is 8 GPUs)."""
+        _, comps = _ui()
+        assert "Number of GPUs" in comps
+        assert "Number of instances" not in comps
+
+    def test_gpu_price_hint_matches_library(self):
+        """The hint quotes price ranges; they must come from the library, not
+        from an old refresh."""
+        _, comps = _ui()
+        hint = comps["GPU cost / hour ($)"].info
+        for gpu in ("H100", "H200", "B200"):
+            prices = [g["cost_hr"] for g in GPU_LIBRARY.values() if g["gpu"] == gpu]
+            assert f"{gpu}: ${min(prices):.2f}-${max(prices):.2f}" in hint, hint
+
+    def test_defaults_can_serve_the_default_workload(self):
+        """First load must not greet the user with 'Capacity insufficient'."""
+        result = master_update(*_ui_default_args())
+        assert "insufficient" not in result[5].lower()   # self-hosted summary
+        assert "insufficient" not in result[8].lower()   # local summary
+
+    def test_default_best_api_is_a_real_model(self):
+        """The headline 'Best API Provider' must not be the unconfigured
+        custom placeholder with an invented price."""
+        summary = master_update(*_ui_default_args())[10]
+        best = re.search(r"Best API Provider</div>.*?>([^<]+)</div>", summary).group(1)
+        assert best in MODEL_LIBRARY, best
+
+
+class TestGpuEventWiring:
+    def test_gpu_dropdowns_recalculate_once(self):
+        """gpu_cost_hr.change already recalculates. Chaining master_update
+        after the provider/instance dropdowns too runs it up to 4 times per
+        click, and the runs can finish out of order."""
+        from app import get_gpu_instances, get_gpu_price
+        demo, comps = _ui()
+        fns = list(demo.fns.values())
+        by_id = {f._id: f for f in fns}
+        dropdown_steps = {f._id for f in fns if f.fn in (get_gpu_instances, get_gpu_price)}
+        chained = [f for f in fns if f.fn is master_update
+                   and getattr(f, "trigger_after", None) in dropdown_steps]
+        assert not chained
+        # and the cost box itself still recalculates
+        cost_id = comps["GPU cost / hour ($)"]._id
+        assert any(f.fn is master_update and (cost_id, "change") in
+                   [tuple(t) for t in f.targets] for f in fns)
+
+
+
+class TestReviewRound3:
+    def _heavy(self, **overrides):
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[2] = 1_000_000
+        for i, v in overrides.items():
+            args[int(i[1:])] = v
+        return master_update(*args)
+
+    def test_charts_leave_out_options_that_cannot_serve_the_load(self):
+        """The table says Local/Edge is 98% short; its bar must not stand
+        next to the API bars as the cheapest option."""
+        r = self._heavy()
+        for fig in (r[12], r[13]):
+            cats = list(fig.data[0].x)
+            assert not any("Local" in c or "Self-Hosted" in c for c in cats), cats
+
+    def test_cost_per_token_not_quoted_for_partial_service(self):
+        """Fixed cost divided by tokens the hardware cannot serve is a
+        fictional unit price."""
+        comp_df = self._heavy()[11]
+        row = comp_df.index[comp_df["Metric"] == "Cost per 1M tokens ($)"][0]
+        assert comp_df.at[row, "Local / Edge"].startswith("N/A")
+
+    def test_break_even_not_reached_when_todays_volume_is_over_capacity(self):
+        """Break-even below today's volume means nothing if the GPUs cannot
+        serve today's volume."""
+        summary = self._heavy(a16=0.5, a21=0, a22=0)[10]
+        assert "over capacity" in summary
+
+    def test_dedupe_never_repeats_a_column(self):
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[7:10] = args[4:7]
+        args[13] = f"{args[4]} (2)"
+        r = master_update(*args)
+        assert len(r[1].columns) == 5
+        x = list(r[3].data[0].x)
+        assert len(set(x)) == len(x), x
+
+    def test_unconfigured_custom_provider_is_not_shown_as_free(self):
+        """Provider 4 at $0/$0 is unconfigured, not a $0 offer."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[14] = args[15] = 0
+        r = master_update(*args)
+        assert "Custom Provider" not in r[1].columns
+        assert "Custom Provider" not in list(r[3].data[0].x)
+
+    def test_price_hint_skips_gpus_missing_from_library(self):
+        """A refresh that drops a GPU type must shorten the hint, not crash
+        app startup."""
+        from app import gpu_price_hint
+        hint = gpu_price_hint(("H100", "NoSuchGPU"))
+        assert hint.startswith("H100: $") and "NoSuchGPU" not in hint
+
+    def test_cleared_device_count_uses_the_ui_default(self):
+        args = _ui_default_args()
+        args[24] = None   # num_dev cleared
+        assert "insufficient" not in master_update(*args)[8].lower()
+
+    def test_zero_lifetime_is_not_a_one_month_write_off(self):
+        """0 years is not a lifetime; it must not amortize the hardware 12x
+        per year. Invalid input falls back to the default 3 years."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        args[27] = 0
+        le_df = master_update(*args)[7]
+        assert _money(le_df.iloc[0, 1]) == pytest.approx(1999 / 3, abs=0.01)

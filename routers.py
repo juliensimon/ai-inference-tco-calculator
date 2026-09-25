@@ -25,7 +25,6 @@ ROUTER_LIBRARY = {
                    "notes": "Provider price + 5%. Catalog prices exclude the markup"},
 }
 
-ACCESS_CHOICES = list(ROUTER_LIBRARY)   # "Direct" first
 ROUTERS = [name for name in ROUTER_LIBRARY if name != "Direct"]
 
 # Which routers list each library model (any host or region).

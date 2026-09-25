@@ -38,9 +38,10 @@ Dispatch **two parallel research agents**:
 ### 4. Apply Updates
 
 - Update `models.py` — add/remove/update entries
+- A model priced from OpenRouter third-party hosts (no first-party API at that price) says "Via OpenRouter" in its notes and gets `"direct": False`, so the app only offers it through a router. The tests enforce that pairing
 - Update `gpus.py` — add/remove/update entries
 - Update `routers.py` fees if a router's fee page changed (openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing). Verify fees against those pages like any other price
-- Refresh router availability: `python check_router_catalogs.py --write`. It exits non-zero if a catalog can't be fetched; if so, leave `ROUTER_AVAILABILITY` unchanged and report it. When a new library model shows no routers but a router lists it under a different name, add an alias to `ALIASES` in that script
+- Refresh router availability: `python check_router_catalogs.py --write`. It exits 2 if a catalog can't be fetched or parsed; if so, leave `ROUTER_AVAILABILITY` unchanged and report it. Exit 3 means a router in `routers.py` has no URL in `CATALOGS`: add it. When a new library model shows no routers but a router lists it under a different name, add an alias to `ALIASES` in that script
 - Update docstring dates in `models.py`, `gpus.py` and `routers.py`
 - Keep entries sorted: by provider (alpha), then by GPU type within provider
 - Key format for GPUs: `"Provider - GPU - instance_type"` or `"Provider - GPU"`
