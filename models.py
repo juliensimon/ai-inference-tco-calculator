@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of September 3, 2026
+Pricing as of September 25, 2026
 
 Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
          ai.google.dev/gemini-api/docs/pricing, docs.x.ai/docs/models,
@@ -9,6 +9,9 @@ Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
 
 # Prices are in $ per 1M tokens
 MODEL_LIBRARY = {
+    "GPT-6 Astra":           {"provider": "OpenAI",    "input": 10,    "output": 50,    "notes": "GPT-6 flagship, 1.05M context, Sep 2026. Long-context (>272K) $20/$75. Cached input $1"},
+    "GPT-6 Sol":             {"provider": "OpenAI",    "input": 2,     "output": 10,    "notes": "Balanced GPT-6 tier, 1.05M context, Sep 2026. Long-context (>272K) $4/$15. Cached input $0.20"},
+    "GPT-6 Luna":            {"provider": "OpenAI",    "input": 0.10,  "output": 0.50,  "notes": "Cost GPT-6 tier, 1.05M context, Sep 2026. Long-context $0.20/$0.75"},
     "GPT-5.6 Sol":           {"provider": "OpenAI",    "input": 4,     "output": 20,    "notes": "Frontier tier, 1.05M context. Long-context (>272K) $8/$30. Promo rate at least through Nov 21, 2026"},
     "GPT-5.6 Terra":         {"provider": "OpenAI",    "input": 2,     "output": 12,    "notes": "Balanced tier, Jul 2026. Long-context $4/$18"},
     "GPT-5.6 Luna":          {"provider": "OpenAI",    "input": 0.20,  "output": 1.20,  "notes": "Cost tier, Jul 2026. Long-context $0.40/$1.80"},
@@ -38,7 +41,8 @@ MODEL_LIBRARY = {
     "Claude Mythos 5.1":     {"provider": "Anthropic", "input": 10,    "output": 50,    "notes": "Limited availability (Project Glasswing); same rate as Fable 5.1"},
     "Claude Fable 5":        {"provider": "Anthropic", "input": 10,    "output": 50,    "notes": "Previous Fable generation, 1M context, Jun 2026"},
     "Claude Mythos 5":       {"provider": "Anthropic", "input": 10,    "output": 50,    "notes": "Limited availability; same rate as Fable 5"},
-    "Claude Opus 5":         {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Recommended default for agentic coding, 1M context, Jul 2026"},
+    "Claude Opus 5.5":       {"provider": "Anthropic", "input": 4,     "output": 20,    "notes": "Recommended default for most workloads, 1M context, Sep 2026. Cache read $0.20 (5%)"},
+    "Claude Opus 5":         {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous Opus generation, 1M context, Jul 2026"},
     "Claude Opus 4.8":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous agentic coding flagship, 1M context"},
     "Claude Sonnet 5":       {"provider": "Anthropic", "input": 2,     "output": 10,    "notes": "Intro $2/$10 now standard; Sep 2026 rise to $3/$15 cancelled"},
     "Claude Haiku 4.5":      {"provider": "Anthropic", "input": 1,     "output": 5,     "notes": "Fast & efficient, great for routing"},
@@ -58,7 +62,8 @@ MODEL_LIBRARY = {
     "Gemini 2.5 Pro":        {"provider": "Google",    "input": 1.25,  "output": 10,    "notes": "Production-ready, 1M context"},
     "Gemini 2.5 Flash":      {"provider": "Google",    "input": 0.3,   "output": 2.5,   "notes": "Capable budget option"},
     "Gemini 2.5 Flash-Lite": {"provider": "Google",    "input": 0.1,   "output": 0.4,   "notes": "Cheapest Google model"},
-    "Grok 4.6":              {"provider": "xAI",       "input": 2,     "output": 6,     "notes": "New flagship, Aug 2026, 500K context; doubles above 200K-token prompts"},
+    "Grok 4.7":              {"provider": "xAI",       "input": 2,     "output": 6,     "notes": "New flagship, Sep 2026, 500K context; doubles above 200K-token prompts. Cached input $0.50"},
+    "Grok 4.6":              {"provider": "xAI",       "input": 2,     "output": 6,     "notes": "Previous flagship, Aug 2026, 500K context; doubles above 200K-token prompts"},
     "Grok 4.5":              {"provider": "xAI",       "input": 2,     "output": 6,     "notes": "Previous flagship, Jun 2026; doubles above 200K-token prompts"},
     "Grok 4.3":              {"provider": "xAI",       "input": 1.25,  "output": 2.5,   "notes": "Mid-tier Grok"},
     "Grok 4.20":             {"provider": "xAI",       "input": 1.25,  "output": 2.5,   "notes": "2M context (price cut from $2/$6)"},
@@ -72,12 +77,12 @@ MODEL_LIBRARY = {
     "Ministral 3 3B":        {"provider": "Mistral",   "input": 0.1,   "output": 0.1,   "notes": "Smallest Ministral, 131K context; flat input/output rate"},
     "Voxtral Small":         {"provider": "Mistral",   "input": 0.1,   "output": 0.4,   "notes": "Audio-input instruct model; text-token rates (audio priced per minute)"},
     "Leanstral 1.5":         {"provider": "Mistral",   "input": None,  "output": None,  "notes": "Lean 4 proof specialist (Labs); free during feedback period, no per-token price"},
-    "DeepSeek V4 Pro":       {"provider": "DeepSeek",  "input": 0.66,  "output": 1.98,  "notes": "First-party API, cache-miss off-peak, 1M context. Peak (01-04 & 06-10 UTC, Mon-Fri) 2x: $1.32/$3.96"},
-    "DeepSeek V4 Flash":     {"provider": "DeepSeek",  "input": 0.22,  "output": 0.66,  "notes": "First-party API, off-peak, 1M context. Peak (01-04 & 06-10 UTC, Mon-Fri) 2x: $0.44/$1.32"},
-    "DeepSeek V4 Flash Vision": {"provider": "DeepSeek", "input": 0.22, "output": 0.66, "notes": "Experimental vision variant, off-peak, 1M context. Peak (Mon-Fri) 2x: $0.44/$1.32"},
+    "DeepSeek V4.1 Flash":   {"provider": "DeepSeek",  "input": 0.15,  "output": 0.6,   "notes": "First-party API (deepseek-flash), off-peak cache-miss, 1M context, Sep 10, 2026. Peak (01-04 & 06-10 UTC, Mon-Fri) 2x: $0.30/$1.20"},
+    "DeepSeek V4 Pro":       {"provider": "DeepSeek",  "input": 0.462, "output": 1.386, "notes": "Phased out by DeepSeek Sep 14, 2026 (first-party requests route to V4.1 Flash). V4-Pro-0813 via OpenRouter third-party hosts"},
+    "DeepSeek V4 Flash":     {"provider": "DeepSeek",  "input": 0.03,  "output": 0.32,  "notes": "Retired by DeepSeek Sep 10, 2026 (routes to V4.1 Flash). V4-Flash-0731 via OpenRouter third-party hosts"},
     "Qwen3.8 Max":           {"provider": "Alibaba",   "input": 2,     "output": 6,     "notes": "2.4T A95B multimodal, 1M context. Model Studio (Singapore) ≤1M tier"},
     "Qwen3.8 2.4T A95B":     {"provider": "Alibaba",   "input": 2,     "output": 6,     "notes": "Open-weights 2.4T MoE (95B active), 1M context. Via OpenRouter."},
-    "Qwen3.8 27B":           {"provider": "Alibaba",   "input": 0.425, "output": 2.55,  "notes": "Open-weights 27B, Aug 2026. Via OpenRouter."},
+    "Qwen3.8 27B":           {"provider": "Alibaba",   "input": 0.42,  "output": 3.0,    "notes": "Open-weights 27B, Aug 2026. Via OpenRouter."},
     "Qwen3.8 Flash":         {"provider": "Alibaba",   "input": 0.15,  "output": 0.47,  "notes": "Model Studio (Singapore) ≤1M tier, Aug 26, 2026"},
     "Qwen3.7 Max":           {"provider": "Alibaba",   "input": 2.5,   "output": 7.5,   "notes": "Model Studio (Singapore); 50% promo ended Sep 2026"},
     "Qwen3.7 Plus":          {"provider": "Alibaba",   "input": 0.32,  "output": 1.28,  "notes": "Model Studio ≤256K non-thinking; list $0.40/$1.60 less 20%"},
@@ -97,15 +102,16 @@ MODEL_LIBRARY = {
     "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.27,  "output": 1.08,  "notes": "Older flagship. Via OpenRouter."},
     "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter."},
     "GLM 5.3":               {"provider": "Zhipu",      "input": 1.4,   "output": 4.4,   "notes": "Latest Z.ai flagship, Aug 2026. First-party API"},
-    "GLM 5.3 Flash":         {"provider": "Zhipu",      "input": 0.075, "output": 0.25,  "notes": "1M context, Aug 2026. 50% promo through Sep 9, 2026; list $0.15/$0.50"},
+    "GLM 5.3 Flash":         {"provider": "Zhipu",      "input": 0.15,  "output": 0.50,  "notes": "1M context, Aug 2026. Launch promo (50% off) ended Sep 9, 2026"},
+    "GLM 5.3 FlashX":        {"provider": "Zhipu",      "input": 0.37,  "output": 1.25,  "notes": "High-speed serving of GLM 5.3 Flash, 1M context, Sep 2026. First-party API"},
     "GLM 5.2":               {"provider": "Zhipu",      "input": 1.4,   "output": 4.4,   "notes": "1M context, agentic/coding. Also on Mistral La Plateforme at same price"},
     "Muse Spark 1.3":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Meta frontier tier, 1M context, Sep 2, 2026. Cached input $0.15. Via OpenRouter."},
     "Muse Spark 1.3 Contributor": {"provider": "Meta",  "input": 0.10,  "output": 0.20,  "notes": "Low-cost Muse Spark 1.3 tier, Sep 2026. Via OpenRouter."},
     "Muse Spark 1.2":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Previous Meta frontier tier, Aug 2026. Via OpenRouter."},
     "Muse Spark 1.2 Contributor": {"provider": "Meta",  "input": 0.10,  "output": 0.20,  "notes": "Low-cost Muse Spark 1.2 tier, Aug 2026. Via OpenRouter."},
     "Muse Spark 1.1":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Meta frontier tier, 1M context, Jul 2026. Cached input $0.15. Via OpenRouter."},
-    "Muse Glimmer 30B":      {"provider": "Meta",       "input": 0.30,  "output": 1.10,  "notes": "Efficient Muse tier, Aug 2026. Via OpenRouter."},
-    "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.2,   "output": 0.696, "notes": "Open-weights 400B MoE (17B active). Via OpenRouter."},
+    "Muse Glimmer 30B":      {"provider": "Meta",       "input": 0.30,  "output": 1.20,  "notes": "Efficient Muse tier, Aug 2026. Via OpenRouter."},
+    "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.1875, "output": 0.6525, "notes": "Open-weights 400B MoE (17B active). Via OpenRouter."},
     "Llama 4 Scout":         {"provider": "Meta",       "input": 0.10,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter."},
 }
 

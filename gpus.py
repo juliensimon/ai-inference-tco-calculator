@@ -1,6 +1,6 @@
 """
 GPU Instance Library — per-GPU on-demand hourly pricing for inference
-Pricing as of September 3, 2026
+Pricing as of September 25, 2026
 
 Sources: aws.amazon.com, cloud.google.com, prices.azure.com,
          coreweave.com, crusoe.ai, lambda.ai, runpod.io,
@@ -111,27 +111,28 @@ GPU_LIBRARY = {
     "Lambda - H100 PCIe":                   {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 3.29,  "vram_gb": 80,  "notes": "1-GPU instance"},
     "Lambda - H100 SXM":                    {"provider": "Lambda",    "gpu": "H100",  "cost_hr": 3.99,  "vram_gb": 80,  "notes": "8-GPU node pricing"},
     # ── RunPod ───────────────────────────────────────────────────────────────
-    "RunPod - A100 PCIe 80GB":              {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.39,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
+    "RunPod - A100 PCIe 80GB":              {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.59,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - A100 SXM 80GB":               {"provider": "RunPod",    "gpu": "A100",  "cost_hr": 1.59,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - B200":                        {"provider": "RunPod",    "gpu": "B200",  "cost_hr": 6.79,  "vram_gb": 192, "notes": "Secure Cloud on-demand"},
     "RunPod - B300":                        {"provider": "RunPod",    "gpu": "B300",  "cost_hr": 7.89,  "vram_gb": 288, "notes": "Secure Cloud on-demand"},
     "RunPod - H100 NVL":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 3.19,  "vram_gb": 94,  "notes": "Secure Cloud on-demand"},
     "RunPod - H100 PCIe":                   {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 2.89,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
-    "RunPod - H100 SXM":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 3.29,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
+    "RunPod - H100 SXM":                    {"provider": "RunPod",    "gpu": "H100",  "cost_hr": 3.49,  "vram_gb": 80,  "notes": "Secure Cloud on-demand"},
     "RunPod - H200 SXM":                    {"provider": "RunPod",    "gpu": "H200",  "cost_hr": 4.59,  "vram_gb": 141, "notes": "Secure Cloud on-demand"},
     "RunPod - L4":                          {"provider": "RunPod",    "gpu": "L4",    "cost_hr": 0.49,  "vram_gb": 24,  "notes": "Secure Cloud on-demand"},
-    "RunPod - L40S":                        {"provider": "RunPod",    "gpu": "L40S",  "cost_hr": 0.99,  "vram_gb": 48,  "notes": "Secure Cloud on-demand"},
+    "RunPod - L40S":                        {"provider": "RunPod",    "gpu": "L40S",  "cost_hr": 1.09,  "vram_gb": 48,  "notes": "Secure Cloud on-demand"},
     "RunPod - RTX PRO 6000":                {"provider": "RunPod",    "gpu": "RTX PRO 6000", "cost_hr": 2.09, "vram_gb": 96, "notes": "Secure Cloud on-demand"},
     # ── Together AI ──────────────────────────────────────────────────────────
     "Together - B200":                      {"provider": "Together",  "gpu": "B200",  "cost_hr": 8.19,  "vram_gb": 192, "notes": "GPU cluster on-demand"},
+    "Together - B300":                      {"provider": "Together",  "gpu": "B300",  "cost_hr": 9.99,  "vram_gb": 288, "notes": "GPU cluster on-demand"},
     "Together - H100":                      {"provider": "Together",  "gpu": "H100",  "cost_hr": 3.99,  "vram_gb": 80,  "notes": "GPU cluster on-demand"},
     "Together - H200":                      {"provider": "Together",  "gpu": "H200",  "cost_hr": 5.99,  "vram_gb": 141, "notes": "GPU cluster on-demand"},
     # ── Vast.ai ──────────────────────────────────────────────────────────────
-    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.10,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=5-6; 4 of 5 samples, one at 1.14)"},
-    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 6.01,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=6-7, bimodal ~6.00/~9.99; stable across 5 samples)"},
-    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 3.14,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=11-13, stable across 5 samples)"},
-    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 4.61,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=11, stable across 5 samples)"},
-    "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.33,  "vram_gb": 24,  "notes": "Marketplace median, verified hosts (n=6); sits on the 0.335 rounding boundary"},
+    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.70,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=7; 4 of 5 samples, one at 1.35 with n=4)"},
+    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 9.38,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=6-8; 3 of 5 samples at 9.38, two at 8.44; volatile)"},
+    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 4.17,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=9-10, stable across 5 samples)"},
+    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 4.80,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=5-7, stable across 5 samples)"},
+    "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.32,  "vram_gb": 24,  "notes": "Marketplace median, verified hosts (n=6-7, stable across 5 samples)"},
     "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.80,  "vram_gb": 48,  "notes": "Marketplace median, verified hosts (n=4)"},
     "Vast.ai - RTX PRO 6000":               {"provider": "Vast.ai",   "gpu": "RTX PRO 6000", "cost_hr": 1.48, "vram_gb": 96, "notes": "Marketplace median, Server Edition (n=9-10, oscillating 1.47-1.49 across 5 samples)"},
 }
