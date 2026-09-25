@@ -35,6 +35,7 @@ How much does it *really* cost to run inference in production? This calculator c
 ## Features
 
 - **103 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
+- **Router fees**: compare buying each model directly against OpenRouter (5.5%), Requesty (5%) or Opper (3%), with per-model router availability in the Model Library
 - **118 GPU instances** for self-hosted inference across 9 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai)
 - **13 GPU types**: L4, L40, L40S, A100, H100, H200, B200, B300, GB200, GH200, RTX PRO 4500, RTX PRO 6000, MI300X (NVIDIA + AMD)
 - **Smart routing** scenario (60/40 cheapest blend across inference providers)
@@ -80,6 +81,8 @@ pytest test_app.py -v
 |------|-------------|
 | `app.py` | UI, calculations, charts, event wiring |
 | `models.py` | API model library (104 models with per-token pricing) |
+| `routers.py` | Router fees and generated per-model router availability |
+| `check_router_catalogs.py` | Refreshes router availability from the OpenRouter, Requesty and Opper catalogs |
 | `gpus.py` | GPU instance library (118 instances across 9 providers) |
 | `test_app.py` | 90 unit tests covering helpers, calculations, and integration |
 | `SOURCES.md` | All pricing data sources for future updates |

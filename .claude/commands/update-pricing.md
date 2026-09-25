@@ -39,7 +39,9 @@ Dispatch **two parallel research agents**:
 
 - Update `models.py` — add/remove/update entries
 - Update `gpus.py` — add/remove/update entries
-- Update docstring dates in both files
+- Update `routers.py` fees if a router's fee page changed (openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing). Verify fees against those pages like any other price
+- Refresh router availability: `python check_router_catalogs.py --write`. It exits non-zero if a catalog can't be fetched; if so, leave `ROUTER_AVAILABILITY` unchanged and report it. When a new library model shows no routers but a router lists it under a different name, add an alias to `ALIASES` in that script
+- Update docstring dates in `models.py`, `gpus.py` and `routers.py`
 - Keep entries sorted: by provider (alpha), then by GPU type within provider
 - Key format for GPUs: `"Provider - GPU - instance_type"` or `"Provider - GPU"`
 
@@ -60,7 +62,7 @@ python -c "from models import MODEL_LIBRARY, API_MODELS; from gpus import GPU_LI
 
 Commit and push to both remotes:
 ```bash
-git add models.py gpus.py SOURCES.md README.md
+git add models.py gpus.py routers.py SOURCES.md README.md app.py
 git commit -m "Update pricing to [MONTH YEAR] ([N] models, [N] GPU instances)"
 git push origin main && git push hf main
 ```

@@ -9,9 +9,10 @@ import re
 import pathlib
 from models import MODEL_LIBRARY, API_MODELS
 from gpus import GPU_LIBRARY, GPU_PROVIDERS
+from routers import ROUTER_LIBRARY, ACCESS_CHOICES, ROUTERS, ROUTER_AVAILABILITY
 from app import (
     sf, fmt_c, fmt_n, fmt_p,
-    get_model_prices, get_gpu_price, get_gpu_instances,
+    get_model_prices, slot_name, get_gpu_price, get_gpu_instances,
     calc_usage, calc_api, calc_smart_routing,
     calc_self_hosted, calc_local, master_update,
     DEFAULT_MODELS, PRICING_DATE,
@@ -34,8 +35,8 @@ class TestPricingDate:
             f"use PRICING_DATE instead")
 
     def test_data_files_agree_with_the_constant(self):
-        import models, gpus
-        for mod in (models, gpus):
+        import models, gpus, routers
+        for mod in (models, gpus, routers):
             assert f"Pricing as of {PRICING_DATE}" in mod.__doc__, (
                 f"{mod.__name__} docstring disagrees with PRICING_DATE")
 
@@ -643,3 +644,74 @@ class TestBreakEven:
         args[20] = 1_000_000  # ample throughput
         result = master_update(*args)
         assert "over capacity" not in result[10]
+
+
+# ═════════════════════════════════════════════════════════════════════════════
+# ROUTERS / GATEWAYS
+# ═════════════════════════════════════════════════════════════════════════════
+
+class TestRouters:
+    """Routers pass provider token prices through and add a fee. The fee must
+    be applied exactly once, and choosing Direct must leave every existing
+    cost unchanged, or the direct-vs-router comparison is meaningless."""
+
+    MODEL = "GPT-6 Sol"
+
+    def test_direct_is_the_default_and_free(self):
+        assert ACCESS_CHOICES[0] == "Direct"
+        assert ROUTER_LIBRARY["Direct"]["fee_pct"] == 0
+        assert get_model_prices(self.MODEL) == get_model_prices(self.MODEL, "Direct")
+
+    @pytest.mark.parametrize("router", ["OpenRouter", "Requesty", "Opper"])
+    def test_fee_applied_exactly_once(self, router):
+        base_in, base_out = get_model_prices(self.MODEL)
+        mult = 1 + ROUTER_LIBRARY[router]["fee_pct"] / 100
+        inp, out = get_model_prices(self.MODEL, router)
+        assert inp == pytest.approx(base_in * mult)
+        assert out == pytest.approx(base_out * mult)
+
+    def test_requesty_matches_its_published_example(self):
+        """requesty.ai/pricing: '$10 per 1M from OpenAI costs $10.50'."""
+        assert get_model_prices(self.MODEL, "Requesty")[1] == pytest.approx(10.50)
+
+    def test_unknown_router_falls_back_to_direct(self):
+        assert get_model_prices(self.MODEL, "NoSuchRouter") == get_model_prices(self.MODEL)
+
+    def test_unpriced_model_stays_zero_through_a_router(self):
+        unpriced = [n for n, m in MODEL_LIBRARY.items() if m["input"] is None]
+        for name in unpriced:
+            assert get_model_prices(name, "OpenRouter") == (0.0, 0.0)
+
+    def test_fees_are_plausible(self):
+        for name, r in ROUTER_LIBRARY.items():
+            assert 0 <= r["fee_pct"] <= 20, f"{name} fee {r['fee_pct']}% looks wrong"
+            for field in ("fee_basis", "byok", "source", "notes"):
+                assert field in r, f"{name} missing {field}"
+
+    def test_availability_covers_library_with_known_routers(self):
+        assert set(ROUTER_AVAILABILITY) == set(MODEL_LIBRARY), (
+            "run: python check_router_catalogs.py --write")
+        for name, avail in ROUTER_AVAILABILITY.items():
+            assert set(avail) <= set(ROUTERS), f"{name}: unknown router in {avail}"
+
+    def test_slot_name_labels_router_slots(self):
+        assert slot_name("GPT-6 Sol", "Direct", "Provider 1") == "GPT-6 Sol"
+        assert slot_name("GPT-6 Sol", "Opper", "Provider 1") == "GPT-6 Sol via Opper"
+        assert slot_name(None, "Direct", "Provider 2") == "Provider 2"
+
+    def test_direct_vs_router_side_by_side(self):
+        """Same model, one slot direct and one via OpenRouter: two distinct
+        columns, and the router total is exactly the fee higher."""
+        args = list(TestMasterUpdate.DEFAULT_ARGS)
+        d_in, d_out = get_model_prices(self.MODEL)
+        r_in, r_out = get_model_prices(self.MODEL, "OpenRouter")
+        args[4:7] = [self.MODEL, d_in, d_out]
+        args[7:10] = [self.MODEL, r_in, r_out]
+        api_table = master_update(*args, "Direct", "OpenRouter", "Direct")[1]
+        direct_col, router_col = self.MODEL, f"{self.MODEL} via OpenRouter"
+        assert direct_col in api_table.columns and router_col in api_table.columns
+        row = api_table.index[api_table["Metric"] == "Total annual cost ($)"][0]
+        money = lambda v: float(v.replace("$", "").replace(",", ""))
+        direct_total = money(api_table.at[row, direct_col])
+        router_total = money(api_table.at[row, router_col])
+        assert router_total == pytest.approx(direct_total * 1.055, rel=1e-3)

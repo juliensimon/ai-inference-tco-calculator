@@ -10,6 +10,7 @@ import pandas as pd
 
 from models import MODEL_LIBRARY, API_MODELS
 from gpus import GPU_LIBRARY, GPU_PROVIDERS
+from routers import ROUTER_LIBRARY, ACCESS_CHOICES, ROUTERS, ROUTER_AVAILABILITY
 
 # Single source for every user-visible pricing date. Update this on a refresh —
 # it feeds the banner, both library tabs, and the GPU table label.
@@ -63,13 +64,24 @@ def _cards_row(*cards):
     return f'<div style="display:flex;gap:0.75rem;margin:0.75rem 0;flex-wrap:wrap">{"".join(cards)}</div>'
 
 
-def get_model_prices(model_name):
-    """Return (input_price, output_price) from model library."""
+def get_model_prices(model_name, access="Direct"):
+    """Return (input_price, output_price) from model library, including the
+    fee of the router the model is bought through. Unknown access -> Direct."""
     if model_name and model_name in MODEL_LIBRARY:
         m = MODEL_LIBRARY[model_name]
         if m["input"] is not None:
-            return float(m["input"]), float(m["output"])
+            fee = ROUTER_LIBRARY.get(access, ROUTER_LIBRARY["Direct"])["fee_pct"]
+            mult = 1 + fee / 100
+            return round(float(m["input"]) * mult, 6), round(float(m["output"]) * mult, 6)
     return 0.0, 0.0
+
+
+def slot_name(model_name, access, default):
+    """Column label for an API slot, e.g. 'GPT-6 Sol via Requesty'."""
+    name = model_name or default
+    if access and access != "Direct" and access in ROUTER_LIBRARY:
+        return f"{name} via {access}"
+    return name
 
 
 def get_gpu_instances(provider):
@@ -288,6 +300,7 @@ def master_update(
     sh_sw_cost, sh_net_cost,
     hw_cost, num_dev, watts, elec_rate, hw_life,
     local_util, local_hours, local_throughput, it_support, local_sw_cost,
+    access_1="Direct", access_2="Direct", access_3="Direct",
 ):
     # ── Safe conversions ──
     input_tpr = sf(input_tpr, 500)
@@ -331,11 +344,11 @@ def master_update(
     )
 
     # ── API providers ──
-    p1 = calc_api(model_1 or "Provider 1", price_in_1, price_out_1,
+    p1 = calc_api(slot_name(model_1, access_1, "Provider 1"), price_in_1, price_out_1,
                   u["input_year_M"], u["output_year_M"], req_day, days_year)
-    p2 = calc_api(model_2 or "Provider 2", price_in_2, price_out_2,
+    p2 = calc_api(slot_name(model_2, access_2, "Provider 2"), price_in_2, price_out_2,
                   u["input_year_M"], u["output_year_M"], req_day, days_year)
-    p3 = calc_api(model_3 or "Provider 3", price_in_3, price_out_3,
+    p3 = calc_api(slot_name(model_3, access_3, "Provider 3"), price_in_3, price_out_3,
                   u["input_year_M"], u["output_year_M"], req_day, days_year)
     p4 = calc_api(model_4_name or "Custom Provider", price_in_4, price_out_4,
                   u["input_year_M"], u["output_year_M"], req_day, days_year)
@@ -824,7 +837,7 @@ def build_app():
                 usage_md = gr.Markdown()
 
                 gr.Markdown("---")
-                gr.Markdown("### API Pricing (per 1M tokens)\nSelect models from dropdowns for Providers 1-3. Provider 4 is fully custom.", elem_classes="section-label")
+                gr.Markdown("### API Pricing (per 1M tokens)\nSelect models from dropdowns for Providers 1-3, bought directly or through a router (OpenRouter, Requesty, Opper), whose fee is added to the price. Provider 4 is fully custom.", elem_classes="section-label")
 
                 with gr.Row():
                     with gr.Column():
@@ -832,6 +845,9 @@ def build_app():
                             choices=API_MODELS, value=DEFAULT_MODELS[0],
                             label="Provider 1: Model",
                             )
+                        access_1 = gr.Dropdown(
+                            choices=ACCESS_CHOICES, value="Direct",
+                            label="Provider 1: Access via")
                         price_in_1 = gr.Number(
                             value=get_model_prices(DEFAULT_MODELS[0])[0],
                             label="Provider 1: Input $ / 1M tokens", interactive=False)
@@ -842,6 +858,9 @@ def build_app():
                         model_2 = gr.Dropdown(
                             choices=API_MODELS, value=DEFAULT_MODELS[1],
                             label="Provider 2: Model")
+                        access_2 = gr.Dropdown(
+                            choices=ACCESS_CHOICES, value="Direct",
+                            label="Provider 2: Access via")
                         price_in_2 = gr.Number(
                             value=get_model_prices(DEFAULT_MODELS[1])[0],
                             label="Provider 2: Input $ / 1M tokens", interactive=False)
@@ -852,6 +871,9 @@ def build_app():
                         model_3 = gr.Dropdown(
                             choices=API_MODELS, value=DEFAULT_MODELS[2],
                             label="Provider 3: Model")
+                        access_3 = gr.Dropdown(
+                            choices=ACCESS_CHOICES, value="Direct",
+                            label="Provider 3: Access via")
                         price_in_3 = gr.Number(
                             value=get_model_prices(DEFAULT_MODELS[2])[0],
                             label="Provider 3: Input $ / 1M tokens", interactive=False)
@@ -975,17 +997,27 @@ def build_app():
             # ─────────────────── Tab 6: Model Library ─────────────────
             with gr.Tab("Model Library"):
                 gr.Markdown(f"### Model Library — {PRICING_DATE} Pricing\nSources: [openai.com](https://developers.openai.com/api/docs/pricing), [platform.claude.com](https://platform.claude.com/docs/en/docs/about-claude/models), [ai.google.dev](https://ai.google.dev/gemini-api/docs/pricing), [docs.x.ai](https://docs.x.ai/docs/models), [api-docs.deepseek.com](https://api-docs.deepseek.com/quick_start/pricing), [mistral.ai](https://mistral.ai/pricing/api/), [alibabacloud.com](https://www.alibabacloud.com/help/en/model-studio/model-pricing), [platform.kimi.ai](https://platform.kimi.ai/docs/pricing), [docs.z.ai](https://docs.z.ai/guides/overview/pricing), [openrouter.ai](https://openrouter.ai)", elem_classes="section-label")
+                gr.Markdown("#### Routers and gateways\nRouters pass provider token prices through and add a fee. Pick one per provider with *Access via* on the Inputs tab. Sources: [openrouter.ai](https://openrouter.ai/docs/faq), [requesty.ai](https://www.requesty.ai/pricing), [opper.ai](https://opper.ai/pricing)")
+                router_df = pd.DataFrame(
+                    [[name, f"{r['fee_pct']:g}%", r["fee_basis"], r["byok"], r["notes"]]
+                     for name, r in ROUTER_LIBRARY.items() if name != "Direct"],
+                    columns=["Router", "Fee", "Fee basis", "BYOK", "Notes"],
+                )
+                gr.Dataframe(value=router_df, label="Router fees", interactive=False)
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     # None means "no published per-token price" — that covers
                     # self-hosted, subscription-only and invite-only models alike.
                     inp = f"${m['input']}" if m["input"] is not None else "N/A (no per-token price)"
                     out = f"${m['output']}" if m["output"] is not None else "N/A (no per-token price)"
-                    lib_rows.append([name, m["provider"], inp, out, m["notes"]])
+                    avail = ROUTER_AVAILABILITY.get(name, ())
+                    lib_rows.append([name, m["provider"], inp, out,
+                                     *["yes" if r in avail else "" for r in ROUTERS],
+                                     m["notes"]])
                 lib_df = pd.DataFrame(
                     lib_rows,
                     columns=["Model Name", "Provider", "Input $/M tok",
-                             "Output $/M tok", "Notes"],
+                             "Output $/M tok", *ROUTERS, "Notes"],
                 )
                 gr.Dataframe(value=lib_df, label="Model Library", interactive=False)
 
@@ -1011,6 +1043,7 @@ def build_app():
             sh_sw_cost, sh_net_cost,
             hw_cost, num_dev, watts, elec_rate, hw_life,
             local_util, local_hours, local_throughput, it_support, local_sw_cost,
+            access_1, access_2, access_3,
         ]
 
         all_outputs = [
@@ -1021,17 +1054,18 @@ def build_app():
             comp_summary, comp_table, comp_annual_chart, comp_per_M_chart,
         ]
 
-        # Model dropdowns: auto-populate prices, then recalculate
-        for dd, pi, po in [
-            (model_1, price_in_1, price_out_1),
-            (model_2, price_in_2, price_out_2),
-            (model_3, price_in_3, price_out_3),
+        # Model or router dropdowns: auto-populate prices, then recalculate
+        for dd, acc, pi, po in [
+            (model_1, access_1, price_in_1, price_out_1),
+            (model_2, access_2, price_in_2, price_out_2),
+            (model_3, access_3, price_in_3, price_out_3),
         ]:
-            dd.change(
-                fn=get_model_prices, inputs=[dd], outputs=[pi, po],
-            ).then(
-                fn=master_update, inputs=all_inputs, outputs=all_outputs,
-            )
+            for trigger in (dd, acc):
+                trigger.change(
+                    fn=get_model_prices, inputs=[dd, acc], outputs=[pi, po],
+                ).then(
+                    fn=master_update, inputs=all_inputs, outputs=all_outputs,
+                )
 
         # GPU provider → update instance list → update price → recalculate
         gpu_provider.change(
