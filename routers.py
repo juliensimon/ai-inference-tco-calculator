@@ -1,6 +1,6 @@
 """
 Router / Gateway Library — fees for buying API models through a router
-Pricing as of September 25, 2026
+Pricing as of September 27, 2026
 
 Sources: openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing
 
@@ -40,6 +40,7 @@ ROUTER_AVAILABILITY = {
     'GPT-5.6 Cyber': (),
     'GPT-5.5 Pro': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-5.5': ('OpenRouter', 'Opper', 'Requesty'),
+    'GPT-5.5 Cyber': (),
     'GPT-5.4 Pro': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-5.4': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-5.4 Mini': ('OpenRouter', 'Opper', 'Requesty'),
@@ -117,6 +118,7 @@ ROUTER_AVAILABILITY = {
     'Qwen3 235B A22B': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K3': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.7 Code': ('OpenRouter', 'Opper', 'Requesty'),
+    'Kimi K2.7 Code Highspeed': (),
     'Kimi K2.6': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.5': ('OpenRouter', 'Opper', 'Requesty'),
     'MiniMax M3': ('OpenRouter', 'Opper', 'Requesty'),

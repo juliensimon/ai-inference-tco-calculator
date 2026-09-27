@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of September 25, 2026
+Pricing as of September 27, 2026
 
 Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
          ai.google.dev/gemini-api/docs/pricing, docs.x.ai/docs/models,
@@ -20,6 +20,7 @@ MODEL_LIBRARY = {
     "GPT-5.6 Cyber":         {"provider": "OpenAI",    "input": 12.5,  "output": 75,    "notes": "Daybreak cyber model (daybreak-red-latest), Aug 2026"},
     "GPT-5.5 Pro":           {"provider": "OpenAI",    "input": 30,    "output": 180,   "notes": "Top-tier reasoning model, Jun 2026"},
     "GPT-5.5":               {"provider": "OpenAI",    "input": 5,     "output": 30,    "notes": "Flagship, Jun 2026"},
+    "GPT-5.5 Cyber":         {"provider": "OpenAI",    "input": 12.5,  "output": 75,    "notes": "Cyber model variant, same rate as GPT-5.6 Cyber. Cached input $1.25"},
     "GPT-5.4 Pro":           {"provider": "OpenAI",    "input": 30,    "output": 180,   "notes": "Reasoning model, Mar 2026"},
     "GPT-5.4":               {"provider": "OpenAI",    "input": 2.5,   "output": 15,    "notes": "Previous flagship, Feb 2026"},
     "GPT-5.4 Mini":          {"provider": "OpenAI",    "input": 0.75,  "output": 4.5,   "notes": "Mid-tier 5.4 variant, Mar 2026"},
@@ -84,7 +85,7 @@ MODEL_LIBRARY = {
     "DeepSeek V4 Flash":     {"provider": "DeepSeek",  "input": 0.03,  "output": 0.32,  "notes": "Retired by DeepSeek Sep 10, 2026 (routes to V4.1 Flash). V4-Flash-0731 via OpenRouter third-party hosts", "direct": False},
     "Qwen3.8 Max":           {"provider": "Alibaba",   "input": 2,     "output": 6,     "notes": "2.4T A95B multimodal, 1M context. Model Studio (Singapore) ≤1M tier"},
     "Qwen3.8 2.4T A95B":     {"provider": "Alibaba",   "input": 2,     "output": 6,     "notes": "Open-weights 2.4T MoE (95B active), 1M context. Via OpenRouter.", "direct": False},
-    "Qwen3.8 27B":           {"provider": "Alibaba",   "input": 0.42,  "output": 3.0,    "notes": "Open-weights 27B, Aug 2026. Via OpenRouter.", "direct": False},
+    "Qwen3.8 27B":           {"provider": "Alibaba",   "input": 0.42,  "output": 3.0,    "notes": "Open-weights 27B, Aug 2026. Via OpenRouter; Model Studio first-party $0.50/$3.00", "direct": False},
     "Qwen3.8 Flash":         {"provider": "Alibaba",   "input": 0.15,  "output": 0.47,  "notes": "Model Studio (Singapore) ≤1M tier, Aug 26, 2026"},
     "Qwen3.7 Max":           {"provider": "Alibaba",   "input": 2.5,   "output": 7.5,   "notes": "Model Studio (Singapore); 50% promo ended Sep 2026"},
     "Qwen3.7 Plus":          {"provider": "Alibaba",   "input": 0.32,  "output": 1.28,  "notes": "Model Studio ≤256K non-thinking; list $0.40/$1.60 less 20%"},
@@ -94,17 +95,18 @@ MODEL_LIBRARY = {
     "Qwen3.5 Flash":         {"provider": "Alibaba",   "input": 0.1,   "output": 0.4,   "notes": "Model Studio (Singapore) budget tier"},
     "Qwen3.5 397B A17B":     {"provider": "Alibaba",   "input": 0.55,  "output": 3.5,   "notes": "Open-weights 397B MoE (17B active), vision-language. Via OpenRouter; Model Studio first-party $0.60/$3.60", "direct": False},
     "Qwen3 Max":             {"provider": "Alibaba",   "input": 1.2,   "output": 6,     "notes": "Model Studio ≤32K tier; rises to $3/$15 at 256K"},
-    "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.455, "output": 1.82,  "notes": "Open-weights 235B MoE (22B active), Instruct. Via OpenRouter.", "direct": False},
+    "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.455, "output": 1.82,  "notes": "Open-weights 235B MoE (22B active), Instruct. Via OpenRouter; Model Studio first-party non-thinking $0.70/$2.80 (thinking output $8.40)", "direct": False},
     "Kimi K3":               {"provider": "Moonshot",   "input": 3,     "output": 15,    "notes": "2.8T MoE multimodal reasoning, 1M context. Cache-hit input $0.30"},
     "Kimi K2.7 Code":        {"provider": "Moonshot",   "input": 0.95,  "output": 4,     "notes": "Coding-specialised. Cache-hit input $0.19"},
+    "Kimi K2.7 Code Highspeed": {"provider": "Moonshot", "input": 1.90, "output": 8,     "notes": "Faster-serving K2.7 Code tier, 2x rate. Cache-hit input $0.38"},
     "Kimi K2.6":             {"provider": "Moonshot",   "input": 0.95,  "output": 4,     "notes": "262K context. Cache-hit input $0.16"},
     "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.45,  "output": 2.25,  "notes": "Retired from Moonshot API Aug 31, 2026; third-party hosts via OpenRouter.", "direct": False},
     "MiniMax M3":            {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "Latest MiniMax flagship, Jun 2026. Via OpenRouter.", "direct": False},
-    "MiniMax M2.7":          {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "Previous flagship. Via OpenRouter.", "direct": False},
+    "MiniMax M2.7":          {"provider": "MiniMax",    "input": 0.21,  "output": 0.84,  "notes": "Previous flagship. Via OpenRouter.", "direct": False},
     "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.27,  "output": 1.08,  "notes": "Older flagship. Via OpenRouter.", "direct": False},
     "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter.", "direct": False},
     "GLM 5.3":               {"provider": "Zhipu",      "input": 1.4,   "output": 4.4,   "notes": "Latest Z.ai flagship, Aug 2026. First-party API"},
-    "GLM 5.3 Flash":         {"provider": "Zhipu",      "input": 0.15,  "output": 0.50,  "notes": "1M context, Aug 2026. Launch promo (50% off) ended Sep 9, 2026"},
+    "GLM 5.3 Flash":         {"provider": "Zhipu",      "input": 0.15,  "output": 0.50,  "notes": "1M context, Aug 2026. Launch promo rate became the standard price after the Sep 9, 2026 promo window; no reversion followed"},
     "GLM 5.3 FlashX":        {"provider": "Zhipu",      "input": 0.37,  "output": 1.25,  "notes": "High-speed serving of GLM 5.3 Flash, 1M context, Sep 2026. First-party API"},
     "GLM 5.2":               {"provider": "Zhipu",      "input": 1.4,   "output": 4.4,   "notes": "1M context, agentic/coding. Also on Mistral La Plateforme at same price"},
     "Muse Spark 1.3":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Meta frontier tier, 1M context, Sep 2, 2026. Cached input $0.15. Via OpenRouter.", "direct": False},
