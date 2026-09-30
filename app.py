@@ -1065,7 +1065,8 @@ def build_app():
                      for name, r in ROUTER_LIBRARY.items() if name != "Direct"],
                     columns=["Router", "Fee", "Fee basis", "BYOK", "Notes"],
                 )
-                gr.Dataframe(value=router_df, label="Router fees", interactive=False)
+                gr.Dataframe(value=router_df, label="Router fees", interactive=False, wrap=True,
+                             column_widths=["12%", "7%", "18%", "28%", "35%"])
                 lib_rows = []
                 for name, m in MODEL_LIBRARY.items():
                     # None means "no published per-token price" — that covers
@@ -1081,7 +1082,11 @@ def build_app():
                     columns=["Model Name", "Provider", "Input $/M tok",
                              "Output $/M tok", *ROUTERS, "Notes"],
                 )
-                gr.Dataframe(value=lib_df, label="Model Library", interactive=False)
+                # Explicit widths: with auto sizing the long Notes column pushes
+                # the router columns off-screen and truncates their headers.
+                gr.Dataframe(value=lib_df, label="Model Library", interactive=False, wrap=True,
+                             column_widths=["15%", "9%", "8%", "8%",
+                                            *["11%"] * len(ROUTERS), f"{60 - 11 * len(ROUTERS)}%"])
 
             # ─────────────────── Tab 7: GPU Library ─────────────────
             with gr.Tab("GPU Library"):
@@ -1091,7 +1096,8 @@ def build_app():
                      "$/hr": v["cost_hr"], "VRAM (GB)": v["vram_gb"], "Notes": v["notes"]}
                     for k, v in GPU_LIBRARY.items()
                 ])
-                gr.Dataframe(value=gpu_df, label=f"GPU Instance Pricing ({PRICING_DATE})", interactive=False)
+                gr.Dataframe(value=gpu_df, label=f"GPU Instance Pricing ({PRICING_DATE})", interactive=False, wrap=True,
+                             column_widths=["22%", "11%", "13%", "8%", "10%", "36%"])
                 gr.Markdown("*Sources: [aws.amazon.com](https://aws.amazon.com/ec2/pricing/on-demand/), [cloud.google.com](https://cloud.google.com/compute/gpus-pricing), [azure.microsoft.com](https://azure.microsoft.com/en-us/pricing/details/virtual-machines/), [coreweave.com](https://www.coreweave.com/pricing), [crusoe.ai](https://www.crusoe.ai/cloud/pricing), [lambda.ai](https://lambda.ai/pricing), [runpod.io](https://www.runpod.io/gpu-pricing), [together.ai](https://www.together.ai/pricing), [vast.ai](https://vast.ai)*")
 
         # ─────────────────── Event Wiring ─────────────────────────────
