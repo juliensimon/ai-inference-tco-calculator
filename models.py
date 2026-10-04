@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of September 27, 2026
+Pricing as of October 4, 2026
 
 Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
          ai.google.dev/gemini-api/docs/pricing, docs.x.ai/docs/models,
@@ -11,6 +11,7 @@ Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
 # "direct": False marks a model priced from third-party hosts on OpenRouter:
 # there is no first-party API at that price, so it can only be bought via a router.
 MODEL_LIBRARY = {
+    "GPT-6.1 Sol":           {"provider": "OpenAI",    "input": 2,     "output": 10,    "notes": "Near-Astra performance at Sol pricing, Sep 29, 2026, 1.05M context. Long-context (>272K) $4/$15. Cached input $0.10"},
     "GPT-6 Astra":           {"provider": "OpenAI",    "input": 10,    "output": 50,    "notes": "GPT-6 flagship, 1.05M context, Sep 2026. Long-context (>272K) $20/$75. Cached input $1"},
     "GPT-6 Sol":             {"provider": "OpenAI",    "input": 2,     "output": 10,    "notes": "Balanced GPT-6 tier, 1.05M context, Sep 2026. Long-context (>272K) $4/$15. Cached input $0.20"},
     "GPT-6 Luna":            {"provider": "OpenAI",    "input": 0.10,  "output": 0.50,  "notes": "Cost GPT-6 tier, 1.05M context, Sep 2026. Long-context $0.20/$0.75"},
@@ -40,6 +41,7 @@ MODEL_LIBRARY = {
     "o3-mini":               {"provider": "OpenAI",    "input": 1.1,   "output": 4.4,   "notes": "Affordable reasoning. Retires Oct 23, 2026"},
     "o4-mini":               {"provider": "OpenAI",    "input": 1.1,   "output": 4.4,   "notes": "Affordable reasoning. Retires Oct 23, 2026"},
     "o1":                    {"provider": "OpenAI",    "input": 15,    "output": 60,    "notes": "Legacy reasoning. Retires Oct 23, 2026"},
+    "GPT-Rosalind Research": {"provider": "OpenAI",    "input": 5,     "output": 25,    "notes": "Life-sciences reasoning model (biology/drug discovery). Trusted-access program only (qualified research orgs); billing begins Oct 5, 2026. Cached input $0.50; no cache-write pricing"},
     "Claude Fable 5.1":      {"provider": "Anthropic", "input": 10,    "output": 50,    "notes": "Most capable GA Anthropic model, 1M context, Sep 1, 2026. Cache read $0.25 (2.5%)"},
     "Claude Mythos 5.1":     {"provider": "Anthropic", "input": 10,    "output": 50,    "notes": "Limited availability (Project Glasswing); same rate as Fable 5.1"},
     "Claude Fable 5":        {"provider": "Anthropic", "input": 10,    "output": 50,    "notes": "Previous Fable generation, 1M context, Jun 2026"},
@@ -47,6 +49,7 @@ MODEL_LIBRARY = {
     "Claude Opus 5.5":       {"provider": "Anthropic", "input": 4,     "output": 20,    "notes": "Recommended default for most workloads, 1M context, Sep 2026. Cache read $0.20 (5%)"},
     "Claude Opus 5":         {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous Opus generation, 1M context, Jul 2026"},
     "Claude Opus 4.8":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous agentic coding flagship, 1M context"},
+    "Claude Sonnet 5.5":     {"provider": "Anthropic", "input": 2,     "output": 10,    "notes": "New Sonnet generation, Oct 2026; same $2/$10 rate as Sonnet 5"},
     "Claude Sonnet 5":       {"provider": "Anthropic", "input": 2,     "output": 10,    "notes": "Intro $2/$10 now standard; Sep 2026 rise to $3/$15 cancelled"},
     "Claude Haiku 4.5":      {"provider": "Anthropic", "input": 1,     "output": 5,     "notes": "Fast & efficient, great for routing"},
     "Claude Opus 4.7":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "1M context; new tokenizer (~30% more tokens)"},
@@ -114,7 +117,7 @@ MODEL_LIBRARY = {
     "Muse Spark 1.2":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Previous Meta frontier tier, Aug 2026. Via OpenRouter.", "direct": False},
     "Muse Spark 1.2 Contributor": {"provider": "Meta",  "input": 0.10,  "output": 0.20,  "notes": "Low-cost Muse Spark 1.2 tier, Aug 2026. Via OpenRouter.", "direct": False},
     "Muse Spark 1.1":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Meta frontier tier, 1M context, Jul 2026. Cached input $0.15. Via OpenRouter.", "direct": False},
-    "Muse Glimmer 30B":      {"provider": "Meta",       "input": 0.30,  "output": 1.20,  "notes": "Efficient Muse tier, Aug 2026. Via OpenRouter.", "direct": False},
+    "Muse Glimmer 30B":      {"provider": "Meta",       "input": 0.35,  "output": 1.50,  "notes": "Efficient Muse tier, Aug 2026. Via OpenRouter (raised from $0.30/$1.20).", "direct": False},
     "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.1875, "output": 0.6525, "notes": "Open-weights 400B MoE (17B active). Via OpenRouter.", "direct": False},
     "Llama 4 Scout":         {"provider": "Meta",       "input": 0.10,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter.", "direct": False},
 }

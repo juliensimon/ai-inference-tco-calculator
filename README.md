@@ -18,10 +18,10 @@ pinned: true
 How much does it *really* cost to run inference in production? This calculator compares the Total Cost of Ownership across three deployment options — API, self-hosted GPU, and local/edge — so you can make informed build-vs-buy decisions for your inference workloads.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Models-106-blue" alt="106 models">
-  <img src="https://img.shields.io/badge/GPU%20Instances-116-green" alt="116 GPU instances">
+  <img src="https://img.shields.io/badge/Models-109-blue" alt="109 models">
+  <img src="https://img.shields.io/badge/GPU%20Instances-118-green" alt="118 GPU instances">
   <img src="https://img.shields.io/badge/GPU%20Providers-9-orange" alt="9 providers">
-  <img src="https://img.shields.io/badge/Pricing-September%2027%2C%202026-red" alt="September 27, 2026 pricing">
+  <img src="https://img.shields.io/badge/Pricing-October%204%2C%202026-red" alt="October 4, 2026 pricing">
 </p>
 
 ## Inference Deployment Options Compared
@@ -34,9 +34,9 @@ How much does it *really* cost to run inference in production? This calculator c
 
 ## Features
 
-- **105 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
+- **108 inference API models** with current per-token pricing from OpenAI, Anthropic, Google, xAI, DeepSeek, Meta, Mistral, and more
 - **Router fees**: compare buying each model directly against OpenRouter (5.5%), Requesty (5%) or Opper (3%), with per-model router availability in the Model Library
-- **116 GPU instances** for self-hosted inference across 9 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai)
+- **118 GPU instances** for self-hosted inference across 9 cloud providers (AWS, GCP, Azure, CoreWeave, Lambda, RunPod, Crusoe, Together AI, Vast.ai)
 - **13 GPU types**: L4, L40, L40S, A100, H100, H200, B200, B300, GB200, GH200, RTX PRO 4500, RTX PRO 6000, MI300X (NVIDIA + AMD)
 - **Smart routing** scenario (60/40 cheapest blend across inference providers)
 - **Break-even analysis** showing the daily request volume where self-hosted inference beats API
