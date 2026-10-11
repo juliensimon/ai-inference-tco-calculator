@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of October 4, 2026
+Pricing as of October 11, 2026
 
 Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
          ai.google.dev/gemini-api/docs/pricing, docs.x.ai/docs/models,
@@ -51,6 +51,7 @@ MODEL_LIBRARY = {
     "Claude Opus 4.8":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous agentic coding flagship, 1M context"},
     "Claude Sonnet 5.5":     {"provider": "Anthropic", "input": 2,     "output": 10,    "notes": "New Sonnet generation, Oct 2026; same $2/$10 rate as Sonnet 5"},
     "Claude Sonnet 5":       {"provider": "Anthropic", "input": 2,     "output": 10,    "notes": "Intro $2/$10 now standard; Sep 2026 rise to $3/$15 cancelled"},
+    "Claude Haiku 5.5":      {"provider": "Anthropic", "input": 0.10,  "output": 0.50,  "notes": "New Haiku generation, Oct 2026, ≤100K-token prompts. Over 100K tokens: $0.50/$2.50. Cache read $0.01 (10%)"},
     "Claude Haiku 4.5":      {"provider": "Anthropic", "input": 1,     "output": 5,     "notes": "Fast & efficient, great for routing"},
     "Claude Opus 4.7":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "1M context; new tokenizer (~30% more tokens)"},
     "Claude Opus 4.6":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous Opus generation, 1M context"},
@@ -58,9 +59,7 @@ MODEL_LIBRARY = {
     "Claude Opus 4.5":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Legacy Opus"},
     "Claude Sonnet 4.5":     {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Legacy Sonnet"},
     "Gemini 3.8 Flash":      {"provider": "Google",    "input": 0.75,  "output": 3.75,  "notes": "Latest Google flagship, GA Sep 2, 2026, 1M context. Promo rate; list $1.50/$7.50 from Jan 1, 2027"},
-    "Gemini 3.7 Flash":      {"provider": "Google",    "input": 0.75,  "output": 3.75,  "notes": "Aug 2026. Promo rate; list $1.50/$7.50 from Jan 1, 2027"},
     "Gemini 3.6 Flash":      {"provider": "Google",    "input": 0.75,  "output": 3.75,  "notes": "Jul 2026. Promo rate; list $1.50/$7.50 from Jan 1, 2027"},
-    "Gemini 3.5 Flash":      {"provider": "Google",    "input": 1.5,   "output": 9,     "notes": "Previous Google flagship, Jun 2026"},
     "Gemini 3.5 Flash-Lite": {"provider": "Google",    "input": 0.3,   "output": 2.5,   "notes": "Cost-efficient 3.5 variant, Jul 2026"},
     "Gemini 3.1 Pro":        {"provider": "Google",    "input": 2,     "output": 12,    "notes": "Preview; ≤200K-token prompt pricing"},
     "Gemini 3 Flash":        {"provider": "Google",    "input": 0.5,   "output": 3,     "notes": "Preview; Pro-grade reasoning at Flash speed"},
@@ -74,6 +73,7 @@ MODEL_LIBRARY = {
     "Grok 4.3":              {"provider": "xAI",       "input": 1.25,  "output": 2.5,   "notes": "Mid-tier Grok"},
     "Grok 4.20":             {"provider": "xAI",       "input": 1.25,  "output": 2.5,   "notes": "2M context (price cut from $2/$6)"},
     "Grok Build 0.1":        {"provider": "xAI",       "input": 1,     "output": 2,     "notes": "Agentic build model; doubles above 200K-token prompts"},
+    "Mistral Large 4":       {"provider": "Mistral",   "input": 0.68,  "output": 2.09,  "notes": "Open-weight multimodal flagship, v26.10, Oct 2026. Sale price; list $1.36/$4.18"},
     "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, via Mistral API"},
     "Mistral Medium 3.5":    {"provider": "Mistral",   "input": 1.5,   "output": 7.5,   "notes": "Mid-tier flagship, 262K context, Jun 2026"},
     "Mistral Small 4":       {"provider": "Mistral",   "input": 0.15,  "output": 0.6,   "notes": "Hybrid reasoning, multimodal, 262K context"},
@@ -82,7 +82,6 @@ MODEL_LIBRARY = {
     "Ministral 3 8B":        {"provider": "Mistral",   "input": 0.15,  "output": 0.15,  "notes": "Edge tier, 262K context; flat input/output rate"},
     "Ministral 3 3B":        {"provider": "Mistral",   "input": 0.1,   "output": 0.1,   "notes": "Smallest Ministral, 131K context; flat input/output rate"},
     "Voxtral Small":         {"provider": "Mistral",   "input": 0.1,   "output": 0.4,   "notes": "Audio-input instruct model; text-token rates (audio priced per minute)"},
-    "Leanstral 1.5":         {"provider": "Mistral",   "input": None,  "output": None,  "notes": "Lean 4 proof specialist (Labs); free during feedback period, no per-token price"},
     "DeepSeek V4.1 Flash":   {"provider": "DeepSeek",  "input": 0.15,  "output": 0.6,   "notes": "First-party API (deepseek-flash), off-peak cache-miss, 1M context, Sep 10, 2026. Peak (01-04 & 06-10 UTC, Mon-Fri) 2x: $0.30/$1.20"},
     "DeepSeek V4 Pro":       {"provider": "DeepSeek",  "input": 0.462, "output": 1.386, "notes": "Phased out by DeepSeek Sep 14, 2026 (first-party requests route to V4.1 Flash). V4-Pro-0813 via OpenRouter third-party hosts", "direct": False},
     "DeepSeek V4 Flash":     {"provider": "DeepSeek",  "input": 0.03,  "output": 0.32,  "notes": "Retired by DeepSeek Sep 10, 2026 (routes to V4.1 Flash). V4-Flash-0731 via OpenRouter third-party hosts", "direct": False},
@@ -98,12 +97,12 @@ MODEL_LIBRARY = {
     "Qwen3.5 Flash":         {"provider": "Alibaba",   "input": 0.1,   "output": 0.4,   "notes": "Model Studio (Singapore) budget tier"},
     "Qwen3.5 397B A17B":     {"provider": "Alibaba",   "input": 0.55,  "output": 3.5,   "notes": "Open-weights 397B MoE (17B active), vision-language. Via OpenRouter; Model Studio first-party $0.60/$3.60", "direct": False},
     "Qwen3 Max":             {"provider": "Alibaba",   "input": 1.2,   "output": 6,     "notes": "Model Studio ≤32K tier; rises to $3/$15 at 256K"},
-    "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.455, "output": 1.82,  "notes": "Open-weights 235B MoE (22B active), Instruct. Via OpenRouter; Model Studio first-party non-thinking $0.70/$2.80 (thinking output $8.40)", "direct": False},
+    "Qwen3 235B A22B":       {"provider": "Alibaba",   "input": 0.15,  "output": 0.75,  "notes": "Open-weights 235B MoE (22B active), Instruct. Via OpenRouter; bare slug delisted, now tracked on the qwen3-235b-a22b-2507 snapshot (median of 7 hosts). Model Studio first-party non-thinking $0.70/$2.80 (thinking output $8.40)", "direct": False},
     "Kimi K3":               {"provider": "Moonshot",   "input": 3,     "output": 15,    "notes": "2.8T MoE multimodal reasoning, 1M context. Cache-hit input $0.30"},
     "Kimi K2.7 Code":        {"provider": "Moonshot",   "input": 0.95,  "output": 4,     "notes": "Coding-specialised. Cache-hit input $0.19"},
     "Kimi K2.7 Code Highspeed": {"provider": "Moonshot", "input": 1.90, "output": 8,     "notes": "Faster-serving K2.7 Code tier, 2x rate. Cache-hit input $0.38"},
     "Kimi K2.6":             {"provider": "Moonshot",   "input": 0.95,  "output": 4,     "notes": "262K context. Cache-hit input $0.16"},
-    "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.45,  "output": 2.25,  "notes": "Retired from Moonshot API Aug 31, 2026; third-party hosts via OpenRouter.", "direct": False},
+    "Kimi K2.5":             {"provider": "Moonshot",   "input": 0.532, "output": 3.325, "notes": "Retired from Moonshot API Aug 31, 2026; third-party hosts via OpenRouter (median of 5 hosts, up from $0.45/$2.25).", "direct": False},
     "MiniMax M3":            {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "Latest MiniMax flagship, Jun 2026. Via OpenRouter.", "direct": False},
     "MiniMax M2.7":          {"provider": "MiniMax",    "input": 0.21,  "output": 0.84,  "notes": "Previous flagship. Via OpenRouter.", "direct": False},
     "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.27,  "output": 1.08,  "notes": "Older flagship. Via OpenRouter.", "direct": False},

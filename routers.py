@@ -1,6 +1,6 @@
 """
 Router / Gateway Library — fees for buying API models through a router
-Pricing as of October 4, 2026
+Pricing as of October 11, 2026
 
 Sources: openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing
 
@@ -71,6 +71,7 @@ ROUTER_AVAILABILITY = {
     'Claude Opus 4.8': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Sonnet 5.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Sonnet 5': ('OpenRouter', 'Opper', 'Requesty'),
+    'Claude Haiku 5.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Haiku 4.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Opus 4.7': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Opus 4.6': ('OpenRouter', 'Opper', 'Requesty'),
@@ -78,9 +79,7 @@ ROUTER_AVAILABILITY = {
     'Claude Opus 4.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Sonnet 4.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3.8 Flash': ('OpenRouter', 'Opper', 'Requesty'),
-    'Gemini 3.7 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3.6 Flash': ('OpenRouter', 'Opper', 'Requesty'),
-    'Gemini 3.5 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3.5 Flash-Lite': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3.1 Pro': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3 Flash': ('OpenRouter', 'Opper', 'Requesty'),
@@ -94,6 +93,7 @@ ROUTER_AVAILABILITY = {
     'Grok 4.3': ('OpenRouter', 'Opper', 'Requesty'),
     'Grok 4.20': ('OpenRouter', 'Opper'),
     'Grok Build 0.1': ('OpenRouter', 'Opper', 'Requesty'),
+    'Mistral Large 4': ('Requesty',),
     'Mistral Large 3': ('OpenRouter', 'Opper', 'Requesty'),
     'Mistral Medium 3.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Mistral Small 4': ('OpenRouter', 'Opper', 'Requesty'),
@@ -102,7 +102,6 @@ ROUTER_AVAILABILITY = {
     'Ministral 3 8B': (),
     'Ministral 3 3B': ('OpenRouter', 'Opper'),
     'Voxtral Small': ('OpenRouter', 'Opper'),
-    'Leanstral 1.5': ('Opper', 'Requesty'),
     'DeepSeek V4.1 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'DeepSeek V4 Pro': ('OpenRouter', 'Opper', 'Requesty'),
     'DeepSeek V4 Flash': ('OpenRouter', 'Opper', 'Requesty'),
@@ -117,8 +116,8 @@ ROUTER_AVAILABILITY = {
     'Qwen3.5 Plus': ('OpenRouter',),
     'Qwen3.5 Flash': ('OpenRouter',),
     'Qwen3.5 397B A17B': ('OpenRouter', 'Opper', 'Requesty'),
-    'Qwen3 Max': ('OpenRouter', 'Opper', 'Requesty'),
-    'Qwen3 235B A22B': ('OpenRouter', 'Opper', 'Requesty'),
+    'Qwen3 Max': ('Requesty',),
+    'Qwen3 235B A22B': ('OpenRouter', 'Requesty'),
     'Kimi K3': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.7 Code': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.7 Code Highspeed': ('Requesty',),

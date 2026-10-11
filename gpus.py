@@ -1,6 +1,6 @@
 """
 GPU Instance Library — per-GPU on-demand hourly pricing for inference
-Pricing as of October 4, 2026
+Pricing as of October 11, 2026
 
 Sources: aws.amazon.com, cloud.google.com, prices.azure.com,
          coreweave.com, crusoe.ai, lambda.ai, runpod.io,
@@ -128,13 +128,13 @@ GPU_LIBRARY = {
     "Together - H100":                      {"provider": "Together",  "gpu": "H100",  "cost_hr": 3.99,  "vram_gb": 80,  "notes": "GPU Clusters tier on-demand; Dedicated Endpoints tier is $5.49. No promo end-date language found on the page as of Oct 4, 2026 (previously noted as expiring Sep 30, 2026)"},
     "Together - H200":                      {"provider": "Together",  "gpu": "H200",  "cost_hr": 5.99,  "vram_gb": 141, "notes": "GPU Clusters tier on-demand; self-serve pricing returned after being Contact-us-only at the Sep 27, 2026 refresh"},
     # ── Vast.ai ──────────────────────────────────────────────────────────────
-    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.19,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=10, tightly converged 1.189-1.260 across 6 samples from two independent sessions; down from 1.60)"},
-    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 8.10,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=15-16; 6 samples from two independent sessions ranged 7.97-8.61, still oscillating at the n=15/16 boundary like prior refreshes, but consistently below the prior 9.38)"},
-    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 2.27,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=9-11; 6 samples from two independent sessions ranged 2.267-2.670, 3 of 6 converged exactly at 2.2674; down from 3.14)"},
-    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 5.00,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=7, exactly 5.0022 across all 6 samples from two independent sessions, identical offer set each time; up from 4.80)"},
-    "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.32,  "vram_gb": 24,  "notes": "Marketplace median, verified hosts (n=10, stable across samples)"},
-    "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.80,  "vram_gb": 48,  "notes": "Marketplace median, verified hosts (n=13-15, stable across samples)"},
-    "Vast.ai - RTX PRO 6000":               {"provider": "Vast.ai",   "gpu": "RTX PRO 6000", "cost_hr": 1.44, "vram_gb": 96, "notes": "Marketplace median, Server Edition (n=28-31, converged 1.43-1.46 across 6 samples from two independent sessions; down from 1.53)"},
+    "Vast.ai - A100 SXM 80GB":              {"provider": "Vast.ai",   "gpu": "A100",  "cost_hr": 1.08,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts, 80GB only (n=7-11, 6 samples from two independent sessions ranged 1.0722-1.1241, all below prior 1.19; down from 1.19)"},
+    "Vast.ai - B200":                       {"provider": "Vast.ai",   "gpu": "B200",  "cost_hr": 7.81,  "vram_gb": 192, "notes": "Marketplace median, verified hosts (n=27, exactly 7.8130 across all 6 samples from two independent sessions; down from 8.10)"},
+    "Vast.ai - H100 SXM":                   {"provider": "Vast.ai",   "gpu": "H100",  "cost_hr": 1.87,  "vram_gb": 80,  "notes": "Marketplace median, verified hosts (n=5, exactly 1.8704 across all 6 samples from two independent sessions; thin market, down sharply from 2.27 as n dropped from 9-11"},
+    "Vast.ai - H200":                       {"provider": "Vast.ai",   "gpu": "H200",  "cost_hr": 5.00,  "vram_gb": 141, "notes": "Marketplace median, verified hosts (n=7, exactly 5.0022 across all 6 samples from two independent sessions, identical offer set each time; unchanged)"},
+    "Vast.ai - L4":                         {"provider": "Vast.ai",   "gpu": "L4",    "cost_hr": 0.33,  "vram_gb": 24,  "notes": "Marketplace median, verified hosts (n=9, exactly 0.3252 across samples; up slightly from 0.32)"},
+    "Vast.ai - L40S":                       {"provider": "Vast.ai",   "gpu": "L40S",  "cost_hr": 0.80,  "vram_gb": 48,  "notes": "Marketplace median, verified hosts (n=10-11, stable across samples; unchanged)"},
+    "Vast.ai - RTX PRO 6000":               {"provider": "Vast.ai",   "gpu": "RTX PRO 6000", "cost_hr": 1.47, "vram_gb": 96, "notes": "Marketplace median, Server Edition (n=21-22, converged 1.4698-1.4717 across samples from two independent sessions; up from 1.44)"},
 }
 
 GPU_PROVIDERS = sorted(set(v["provider"] for v in GPU_LIBRARY.values()))

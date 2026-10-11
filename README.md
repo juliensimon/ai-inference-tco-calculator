@@ -18,10 +18,10 @@ pinned: true
 How much does it *really* cost to run inference in production? This calculator compares the Total Cost of Ownership across three deployment options — API, self-hosted GPU, and local/edge — so you can make informed build-vs-buy decisions for your inference workloads.
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Models-109-blue" alt="109 models">
+  <img src="https://img.shields.io/badge/Models-108-blue" alt="108 models">
   <img src="https://img.shields.io/badge/GPU%20Instances-118-green" alt="118 GPU instances">
   <img src="https://img.shields.io/badge/GPU%20Providers-9-orange" alt="9 providers">
-  <img src="https://img.shields.io/badge/Pricing-October%204%2C%202026-red" alt="October 4, 2026 pricing">
+  <img src="https://img.shields.io/badge/Pricing-October%2011%2C%202026-red" alt="October 11, 2026 pricing">
 </p>
 
 ## Inference Deployment Options Compared

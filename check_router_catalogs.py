@@ -44,7 +44,7 @@ ALIASES = {
     "Qwen3.8 Max":        ["qwen3.8-max-0902"],
     "Qwen3.5 Plus":       ["qwen3.5-plus-20260420"],
     "Qwen3.5 Flash":      ["qwen3.5-flash-02-23"],
-    "Qwen3 235B A22B":    ["qwen3-235b-a22b-instruct-2507"],
+    "Qwen3 235B A22B":    ["qwen3-235b-a22b-2507"],
     "Llama 4 Maverick":   ["llama-4-maverick-17b-128e-instruct-fp8"],
     "Llama 4 Scout":      ["llama-4-scout-17b-16e-instruct"],
 }
