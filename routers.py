@@ -1,6 +1,6 @@
 """
 Router / Gateway Library — fees for buying API models through a router
-Pricing as of October 11, 2026
+Pricing as of October 18, 2026
 
 Sources: openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing
 
@@ -78,6 +78,7 @@ ROUTER_AVAILABILITY = {
     'Claude Sonnet 4.6': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Opus 4.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Sonnet 4.5': ('OpenRouter', 'Opper', 'Requesty'),
+    'Gemini 4 Argon': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3.8 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3.6 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'Gemini 3.5 Flash-Lite': ('OpenRouter', 'Opper', 'Requesty'),
@@ -93,7 +94,7 @@ ROUTER_AVAILABILITY = {
     'Grok 4.3': ('OpenRouter', 'Opper', 'Requesty'),
     'Grok 4.20': ('OpenRouter', 'Opper'),
     'Grok Build 0.1': ('OpenRouter', 'Opper', 'Requesty'),
-    'Mistral Large 4': ('Requesty',),
+    'Mistral Large 4': ('Opper', 'Requesty'),
     'Mistral Large 3': ('OpenRouter', 'Opper', 'Requesty'),
     'Mistral Medium 3.5': ('OpenRouter', 'Opper', 'Requesty'),
     'Mistral Small 4': ('OpenRouter', 'Opper', 'Requesty'),
@@ -131,7 +132,7 @@ ROUTER_AVAILABILITY = {
     'GLM 5.3 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'GLM 5.3 FlashX': ('OpenRouter', 'Requesty'),
     'GLM 5.2': ('OpenRouter', 'Opper', 'Requesty'),
-    'Muse Spark 1.3': ('OpenRouter', 'Opper'),
+    'Muse Spark 1.3': ('OpenRouter', 'Opper', 'Requesty'),
     'Muse Spark 1.3 Contributor': ('OpenRouter', 'Opper'),
     'Muse Spark 1.2': ('OpenRouter', 'Opper'),
     'Muse Spark 1.2 Contributor': ('OpenRouter',),

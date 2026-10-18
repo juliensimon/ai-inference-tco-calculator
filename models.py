@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of October 11, 2026
+Pricing as of October 18, 2026
 
 Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
          ai.google.dev/gemini-api/docs/pricing, docs.x.ai/docs/models,
@@ -57,7 +57,8 @@ MODEL_LIBRARY = {
     "Claude Opus 4.6":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Previous Opus generation, 1M context"},
     "Claude Sonnet 4.6":     {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Previous Sonnet, 1M context"},
     "Claude Opus 4.5":       {"provider": "Anthropic", "input": 5,     "output": 25,    "notes": "Legacy Opus"},
-    "Claude Sonnet 4.5":     {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Legacy Sonnet"},
+    "Claude Sonnet 4.5":     {"provider": "Anthropic", "input": 3,     "output": 15,    "notes": "Deprecated Sep 30, 2026; retires Nov 30, 2026 (replacement: Sonnet 5.5)"},
+    "Gemini 4 Argon":        {"provider": "Google",    "input": 2,     "output": 10,    "notes": "New Google flagship reasoning model, Oct 13, 2026. Not on Free tier. Promo rate through Nov 30, 2026; list $4/$20 from Dec 1, 2026. Context caching $0.10 (promo)/$0.20 (list)"},
     "Gemini 3.8 Flash":      {"provider": "Google",    "input": 0.75,  "output": 3.75,  "notes": "Latest Google flagship, GA Sep 2, 2026, 1M context. Promo rate; list $1.50/$7.50 from Jan 1, 2027"},
     "Gemini 3.6 Flash":      {"provider": "Google",    "input": 0.75,  "output": 3.75,  "notes": "Jul 2026. Promo rate; list $1.50/$7.50 from Jan 1, 2027"},
     "Gemini 3.5 Flash-Lite": {"provider": "Google",    "input": 0.3,   "output": 2.5,   "notes": "Cost-efficient 3.5 variant, Jul 2026"},
@@ -82,7 +83,7 @@ MODEL_LIBRARY = {
     "Ministral 3 8B":        {"provider": "Mistral",   "input": 0.15,  "output": 0.15,  "notes": "Edge tier, 262K context; flat input/output rate"},
     "Ministral 3 3B":        {"provider": "Mistral",   "input": 0.1,   "output": 0.1,   "notes": "Smallest Ministral, 131K context; flat input/output rate"},
     "Voxtral Small":         {"provider": "Mistral",   "input": 0.1,   "output": 0.4,   "notes": "Audio-input instruct model; text-token rates (audio priced per minute)"},
-    "DeepSeek V4.1 Flash":   {"provider": "DeepSeek",  "input": 0.15,  "output": 0.6,   "notes": "First-party API (deepseek-flash), off-peak cache-miss, 1M context, Sep 10, 2026. Peak (01-04 & 06-10 UTC, Mon-Fri) 2x: $0.30/$1.20"},
+    "DeepSeek V4.1 Flash":   {"provider": "DeepSeek",  "input": 0.15,  "output": 0.6,   "notes": "First-party API (deepseek-flash), off-peak cache-miss, 1M context, Sep 10, 2026; updated to V4.1-Flash-1017 Oct 17, 2026 (no price change). Peak (01-04 & 06-10 UTC, Mon-Fri) 2x: $0.30/$1.20"},
     "DeepSeek V4 Pro":       {"provider": "DeepSeek",  "input": 0.462, "output": 1.386, "notes": "Phased out by DeepSeek Sep 14, 2026 (first-party requests route to V4.1 Flash). V4-Pro-0813 via OpenRouter third-party hosts", "direct": False},
     "DeepSeek V4 Flash":     {"provider": "DeepSeek",  "input": 0.03,  "output": 0.32,  "notes": "Retired by DeepSeek Sep 10, 2026 (routes to V4.1 Flash). V4-Flash-0731 via OpenRouter third-party hosts", "direct": False},
     "Qwen3.8 Max":           {"provider": "Alibaba",   "input": 2,     "output": 6,     "notes": "2.4T A95B multimodal, 1M context. Model Studio (Singapore) ≤1M tier"},
