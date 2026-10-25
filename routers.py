@@ -1,6 +1,6 @@
 """
 Router / Gateway Library — fees for buying API models through a router
-Pricing as of October 18, 2026
+Pricing as of October 25, 2026
 
 Sources: openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing
 
@@ -62,6 +62,7 @@ ROUTER_AVAILABILITY = {
     'o4-mini': ('OpenRouter', 'Opper', 'Requesty'),
     'o1': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-Rosalind Research': (),
+    'GPT-Rosalind Discovery': (),
     'Claude Fable 5.1': ('OpenRouter', 'Opper', 'Requesty'),
     'Claude Mythos 5.1': (),
     'Claude Fable 5': ('OpenRouter', 'Opper', 'Requesty'),
@@ -111,7 +112,7 @@ ROUTER_AVAILABILITY = {
     'Qwen3.8 27B': ('OpenRouter', 'Opper', 'Requesty'),
     'Qwen3.8 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'Qwen3.7 Max': ('OpenRouter', 'Opper', 'Requesty'),
-    'Qwen3.7 Plus': ('OpenRouter', 'Opper', 'Requesty'),
+    'Qwen3.7 Plus': ('OpenRouter', 'Requesty'),
     'Qwen3.7 Flash': ('OpenRouter',),
     'Qwen3.6 Flash': ('OpenRouter',),
     'Qwen3.5 Plus': ('OpenRouter',),
@@ -119,11 +120,14 @@ ROUTER_AVAILABILITY = {
     'Qwen3.5 397B A17B': ('OpenRouter', 'Opper', 'Requesty'),
     'Qwen3 Max': ('Requesty',),
     'Qwen3 235B A22B': ('OpenRouter', 'Requesty'),
+    'Kimi K3.1 Pro': ('OpenRouter', 'Opper', 'Requesty'),
+    'Kimi K3.1 Pro Highspeed': ('Requesty',),
     'Kimi K3': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.7 Code': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.7 Code Highspeed': ('Requesty',),
     'Kimi K2.6': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.5': ('OpenRouter', 'Opper', 'Requesty'),
+    'MiniMax M3.1 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'MiniMax M3': ('OpenRouter', 'Opper', 'Requesty'),
     'MiniMax M2.7': ('OpenRouter', 'Opper', 'Requesty'),
     'MiniMax M2.5': ('OpenRouter', 'Opper', 'Requesty'),
@@ -132,6 +136,8 @@ ROUTER_AVAILABILITY = {
     'GLM 5.3 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'GLM 5.3 FlashX': ('OpenRouter', 'Requesty'),
     'GLM 5.2': ('OpenRouter', 'Opper', 'Requesty'),
+    'Muse Wonder': ('OpenRouter',),
+    'Muse Spark Open': ('OpenRouter', 'Opper', 'Requesty'),
     'Muse Spark 1.3': ('OpenRouter', 'Opper', 'Requesty'),
     'Muse Spark 1.3 Contributor': ('OpenRouter', 'Opper'),
     'Muse Spark 1.2': ('OpenRouter', 'Opper'),
