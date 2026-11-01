@@ -1,6 +1,6 @@
 """
 Router / Gateway Library — fees for buying API models through a router
-Pricing as of October 25, 2026
+Pricing as of November 1, 2026
 
 Sources: openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing
 
@@ -14,9 +14,9 @@ ROUTER_LIBRARY = {
     "Direct":     {"fee_pct": 0.0, "fee_basis": "none",                      "byok": "n/a",
                    "source": "",
                    "notes": "Provider's own API at list price"},
-    "OpenRouter": {"fee_pct": 5.5, "fee_basis": "credit purchase (card)",    "byok": "free up to $25k/month list-price usage, then 5%",
-                   "source": "https://openrouter.ai/docs/faq",
-                   "notes": "No markup on token prices. Card credits 5.5% ($0.80 minimum), crypto 5%"},
+    "OpenRouter": {"fee_pct": 5.5, "fee_basis": "credit purchase",           "byok": "free up to $25k/month list-price usage, then 5%",
+                   "source": "https://openrouter.ai/pricing",
+                   "notes": "No markup on token prices. As of Nov 1, 2026: 5.5% on Standard tier, 8% on Business tier, charged on credit purchases not individual requests. The docs/faq page's fee strings now render as unfilled template placeholders; openrouter.ai/pricing is the live source. No card/crypto split or $0.80 minimum stated anymore (both were in the prior fee page)"},
     "Opper":      {"fee_pct": 3.0, "fee_basis": "credit purchase (Gateway)", "byok": "free on Gateway",
                    "source": "https://opper.ai/pricing",
                    "notes": "No markup on token prices. Control Plane features raise the fee to 5.5%"},
@@ -35,6 +35,8 @@ ROUTER_AVAILABILITY = {
     'GPT-6 Astra': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-6 Sol': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-6 Luna': ('OpenRouter', 'Opper', 'Requesty'),
+    'GPT-6.1 Terra': ('OpenRouter', 'Opper', 'Requesty'),
+    'GPT-6 Rosalind': (),
     'GPT-5.6 Sol': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-5.6 Terra': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-5.6 Luna': ('OpenRouter', 'Opper', 'Requesty'),
@@ -60,7 +62,7 @@ ROUTER_AVAILABILITY = {
     'o3': ('OpenRouter', 'Opper', 'Requesty'),
     'o3-mini': ('OpenRouter', 'Opper', 'Requesty'),
     'o4-mini': ('OpenRouter', 'Opper', 'Requesty'),
-    'o1': ('OpenRouter', 'Opper', 'Requesty'),
+    'o1': ('Opper', 'Requesty'),
     'GPT-Rosalind Research': (),
     'GPT-Rosalind Discovery': (),
     'Claude Fable 5.1': ('OpenRouter', 'Opper', 'Requesty'),
