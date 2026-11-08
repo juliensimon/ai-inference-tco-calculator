@@ -1,6 +1,6 @@
 """
 Router / Gateway Library — fees for buying API models through a router
-Pricing as of November 1, 2026
+Pricing as of November 8, 2026
 
 Sources: openrouter.ai/docs/faq, requesty.ai/pricing, opper.ai/pricing
 
@@ -16,7 +16,7 @@ ROUTER_LIBRARY = {
                    "notes": "Provider's own API at list price"},
     "OpenRouter": {"fee_pct": 5.5, "fee_basis": "credit purchase",           "byok": "free up to $25k/month list-price usage, then 5%",
                    "source": "https://openrouter.ai/pricing",
-                   "notes": "No markup on token prices. As of Nov 1, 2026: 5.5% on Standard tier, 8% on Business tier, charged on credit purchases not individual requests. The docs/faq page's fee strings now render as unfilled template placeholders; openrouter.ai/pricing is the live source. No card/crypto split or $0.80 minimum stated anymore (both were in the prior fee page)"},
+                   "notes": "No markup on token prices. As of Nov 8, 2026: 5.5% on Standard tier, 8% on Business tier, charged on credit purchases not individual requests (reconfirmed unchanged from Nov 1). The docs/faq page's fee strings now render as unfilled template placeholders; openrouter.ai/pricing is the live source. No card/crypto split or $0.80 minimum stated anymore (both were in the prior fee page)"},
     "Opper":      {"fee_pct": 3.0, "fee_basis": "credit purchase (Gateway)", "byok": "free on Gateway",
                    "source": "https://opper.ai/pricing",
                    "notes": "No markup on token prices. Control Plane features raise the fee to 5.5%"},
@@ -37,6 +37,8 @@ ROUTER_AVAILABILITY = {
     'GPT-6 Luna': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-6.1 Terra': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-6 Rosalind': (),
+    'GPT-6 Astra for Law': (),
+    'GPT-6 Cyber': (),
     'GPT-5.6 Sol': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-5.6 Terra': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-5.6 Luna': ('OpenRouter', 'Opper', 'Requesty'),
@@ -60,9 +62,6 @@ ROUTER_AVAILABILITY = {
     'GPT-4.1 Mini': ('OpenRouter', 'Opper', 'Requesty'),
     'GPT-4.1 Nano': ('OpenRouter', 'Opper', 'Requesty'),
     'o3': ('OpenRouter', 'Opper', 'Requesty'),
-    'o3-mini': ('OpenRouter', 'Opper', 'Requesty'),
-    'o4-mini': ('OpenRouter', 'Opper', 'Requesty'),
-    'o1': ('Opper', 'Requesty'),
     'GPT-Rosalind Research': (),
     'GPT-Rosalind Discovery': (),
     'Claude Fable 5.1': ('OpenRouter', 'Opper', 'Requesty'),
@@ -97,6 +96,7 @@ ROUTER_AVAILABILITY = {
     'Grok 4.3': ('OpenRouter', 'Opper', 'Requesty'),
     'Grok 4.20': ('OpenRouter', 'Opper'),
     'Grok Build 0.1': ('OpenRouter', 'Opper', 'Requesty'),
+    'Grok 4.20 Multi-Agent': ('OpenRouter',),
     'Mistral Large 4': ('Opper', 'Requesty'),
     'Mistral Large 3': ('OpenRouter', 'Opper', 'Requesty'),
     'Mistral Medium 3.5': ('OpenRouter', 'Opper', 'Requesty'),
@@ -123,7 +123,7 @@ ROUTER_AVAILABILITY = {
     'Qwen3 Max': ('Requesty',),
     'Qwen3 235B A22B': ('OpenRouter', 'Requesty'),
     'Kimi K3.1 Pro': ('OpenRouter', 'Opper', 'Requesty'),
-    'Kimi K3.1 Pro Highspeed': ('Requesty',),
+    'Kimi K3.1 Pro Highspeed': ('Opper', 'Requesty'),
     'Kimi K3': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.7 Code': ('OpenRouter', 'Opper', 'Requesty'),
     'Kimi K2.7 Code Highspeed': ('Requesty',),
@@ -133,10 +133,10 @@ ROUTER_AVAILABILITY = {
     'MiniMax M3': ('OpenRouter', 'Opper', 'Requesty'),
     'MiniMax M2.7': ('OpenRouter', 'Opper', 'Requesty'),
     'MiniMax M2.5': ('OpenRouter', 'Opper', 'Requesty'),
-    'MiniMax M2-Her': ('OpenRouter',),
     'GLM 5.3': ('OpenRouter', 'Opper', 'Requesty'),
     'GLM 5.3 Flash': ('OpenRouter', 'Opper', 'Requesty'),
     'GLM 5.3 FlashX': ('OpenRouter', 'Requesty'),
+    'GLM 5.3 FlashX Legal': ('OpenRouter',),
     'GLM 5.2': ('OpenRouter', 'Opper', 'Requesty'),
     'Muse Wonder': ('OpenRouter',),
     'Muse Spark Open': ('OpenRouter', 'Opper', 'Requesty'),

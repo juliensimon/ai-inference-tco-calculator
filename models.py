@@ -1,6 +1,6 @@
 """
 API Model Library — per-token inference pricing
-Pricing as of November 1, 2026
+Pricing as of November 8, 2026
 
 Sources: developers.openai.com/api/docs/pricing, platform.claude.com/docs,
          ai.google.dev/gemini-api/docs/pricing, docs.x.ai/docs/models,
@@ -17,7 +17,9 @@ MODEL_LIBRARY = {
     "GPT-6 Luna":            {"provider": "OpenAI",    "input": 0.10,  "output": 0.50,  "notes": "Cost GPT-6 tier, 1.05M context, Sep 2026. Long-context $0.20/$0.75"},
     "GPT-6.1 Terra":         {"provider": "OpenAI",    "input": 1,     "output": 5,     "notes": "New mid-tier GPT-6.1 variant (below Sol), Nov 2026. Cached input $0.05. Added Nov 1, 2026 refresh"},
     "GPT-6 Rosalind":        {"provider": "OpenAI",    "input": 15,    "output": 75,    "notes": "Life-sciences trusted-access tier (GPT-6 generation, pricier than Rosalind Research/Discovery). Long-context (>272K) $30/$112.50, cached $3. Cached input $1.50. Added Nov 1, 2026 refresh"},
-    "GPT-5.6 Sol":           {"provider": "OpenAI",    "input": 4,     "output": 20,    "notes": "Frontier tier, 1.05M context. Long-context (>272K) $8/$30. Promo rate at least through Nov 21, 2026"},
+    "GPT-6 Astra for Law":   {"provider": "OpenAI",    "input": 10,    "output": 50,    "notes": "Legal model configuration, same rate as GPT-6 Astra. Cached input $1. Promotional pricing at least through Dec 31, 2026. Added Nov 8, 2026 refresh"},
+    "GPT-6 Cyber":           {"provider": "OpenAI",    "input": 20,    "output": 100,   "notes": "New top-tier cyber model (above GPT-5.6 Cyber/GPT-5.5 Cyber, both still $12.5/$75). Cached input $2. Added Nov 8, 2026 refresh"},
+    "GPT-5.6 Sol":           {"provider": "OpenAI",    "input": 4,     "output": 20,    "notes": "Frontier tier, 1.05M context. Long-context (>272K) $8/$30. Promo rate; page now says \"available until November 30, 2026\" (firmed up from \"at least through Nov 21, 2026\")"},
     "GPT-5.6 Terra":         {"provider": "OpenAI",    "input": 2,     "output": 12,    "notes": "Balanced tier, Jul 2026. Long-context $4/$18"},
     "GPT-5.6 Luna":          {"provider": "OpenAI",    "input": 0.20,  "output": 1.20,  "notes": "Cost tier, Jul 2026. Long-context $0.40/$1.80"},
     "GPT-5.6 Cyber":         {"provider": "OpenAI",    "input": 12.5,  "output": 75,    "notes": "Daybreak cyber model (daybreak-red-latest), Aug 2026"},
@@ -40,9 +42,6 @@ MODEL_LIBRARY = {
     "GPT-4.1 Mini":          {"provider": "OpenAI",    "input": 0.4,   "output": 1.6,   "notes": "Efficient mid-tier, 1M context"},
     "GPT-4.1 Nano":          {"provider": "OpenAI",    "input": 0.1,   "output": 0.4,   "notes": "Fastest & cheapest GPT-4.1"},
     "o3":                    {"provider": "OpenAI",    "input": 2,     "output": 8,     "notes": "Reasoning model. Retires Dec 11, 2026"},
-    "o3-mini":               {"provider": "OpenAI",    "input": 1.1,   "output": 4.4,   "notes": "Affordable reasoning. Retires Oct 23, 2026"},
-    "o4-mini":               {"provider": "OpenAI",    "input": 1.1,   "output": 4.4,   "notes": "Affordable reasoning. Retires Oct 23, 2026"},
-    "o1":                    {"provider": "OpenAI",    "input": 15,    "output": 60,    "notes": "Legacy reasoning. Retires Oct 23, 2026"},
     "GPT-Rosalind Research": {"provider": "OpenAI",    "input": 5,     "output": 25,    "notes": "Life-sciences reasoning model (biology/drug discovery). Trusted-access program only (qualified research orgs); billing begins Oct 5, 2026. Cached input $0.50; no cache-write pricing"},
     "GPT-Rosalind Discovery": {"provider": "OpenAI",   "input": 5,     "output": 25,    "notes": "Second GPT-Rosalind life-sciences tier, same rate as Rosalind Research. Trusted-access program only. Cached input $0.50; no cache-write pricing. Added Oct 25, 2026 refresh"},
     "Claude Fable 5.1":      {"provider": "Anthropic", "input": 10,    "output": 50,    "notes": "Most capable GA Anthropic model, 1M context, Sep 1, 2026. Cache read $0.25 (2.5%)"},
@@ -77,6 +76,7 @@ MODEL_LIBRARY = {
     "Grok 4.3":              {"provider": "xAI",       "input": 1.25,  "output": 2.5,   "notes": "Mid-tier Grok"},
     "Grok 4.20":             {"provider": "xAI",       "input": 1.25,  "output": 2.5,   "notes": "1M context (price cut from $2/$6); corrected from a stale '2M context' note (docs.x.ai lists maxPromptLength 1,000,000)"},
     "Grok Build 0.1":        {"provider": "xAI",       "input": 1,     "output": 2,     "notes": "Agentic build model; doubles above 200K-token prompts"},
+    "Grok 4.20 Multi-Agent": {"provider": "xAI",       "input": 1.25,  "output": 2.50,  "notes": "New multi-agent variant of Grok 4.20, 1M context; doubles above 200K-token prompts ($2.50/$5.00). Added Nov 8, 2026 refresh"},
     "Mistral Large 4":       {"provider": "Mistral",   "input": 0.70,  "output": 2.10,  "notes": "Open-weight multimodal flagship, v26.10. New launch sale as of Nov 1, 2026 refresh: page string reads \"Launch pricing: 50% off for 2 weeks\" (no exact end date given), implied list ~$1.40/$4.20. Cached input $0.07"},
     "Mistral Large 3":       {"provider": "Mistral",   "input": 0.5,   "output": 1.5,   "notes": "675B params, via Mistral API. Deprecated Oct 31, 2026, tentative retirement Apr 30, 2027, replacement Mistral Large 4 (docs.mistral.ai/getting-started/models). Dropped off the live pricing page but still billable; price unchanged"},
     "Mistral Medium 3.5":    {"provider": "Mistral",   "input": 1.5,   "output": 7.5,   "notes": "Mid-tier flagship, 262K context, Jun 2026. Deprecated Oct 31, 2026, tentative retirement Apr 30, 2027, replacement Mistral Large 4. Dropped off the live pricing page but still billable; price unchanged"},
@@ -113,10 +113,10 @@ MODEL_LIBRARY = {
     "MiniMax M3":            {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "Latest MiniMax flagship, Jun 2026. Via OpenRouter.", "direct": False},
     "MiniMax M2.7":          {"provider": "MiniMax",    "input": 0.30,  "output": 1.20,  "notes": "Previous flagship. Via OpenRouter (median of 6 hosts, up from $0.21/$0.84 single-cheapest-host read).", "direct": False},
     "MiniMax M2.5":          {"provider": "MiniMax",    "input": 0.30,  "output": 1.20,  "notes": "Older flagship. Via OpenRouter (median of 8 hosts, up from $0.27/$1.08).", "direct": False},
-    "MiniMax M2-Her":        {"provider": "MiniMax",    "input": 0.3,   "output": 1.2,   "notes": "65K context. Via OpenRouter.", "direct": False},
     "GLM 5.3":               {"provider": "Zhipu",      "input": 1.4,   "output": 4.4,   "notes": "Latest Z.ai flagship, Aug 2026. First-party API"},
     "GLM 5.3 Flash":         {"provider": "Zhipu",      "input": 0.15,  "output": 0.50,  "notes": "1M context, Aug 2026. Launch promo rate became the standard price after the Sep 9, 2026 promo window; no reversion followed"},
     "GLM 5.3 FlashX":        {"provider": "Zhipu",      "input": 0.37,  "output": 1.25,  "notes": "High-speed serving of GLM 5.3 Flash, 1M context, Sep 2026. First-party API"},
+    "GLM 5.3 FlashX Legal":  {"provider": "Zhipu",      "input": 0.37,  "output": 1.25,  "notes": "New legal-domain variant of GLM 5.3 FlashX, same rate. First-party API. Added Nov 8, 2026 refresh"},
     "GLM 5.2":               {"provider": "Zhipu",      "input": 1.4,   "output": 4.4,   "notes": "1M context, agentic/coding. Also on Mistral La Plateforme at same price"},
     "Muse Wonder":           {"provider": "Meta",       "input": 4,     "output": 20,    "notes": "New Meta frontier reasoning model, Oct 2026, 1M context, multimodal (text/image/video/audio/PDF). Via OpenRouter; single host (Meta) as of this refresh, no cross-host median available yet.", "direct": False},
     "Muse Spark Open":       {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Coding-optimized open-weight Muse Spark variant for agentic coding, Oct 15, 2026, 1M context. Via OpenRouter (6 hosts all agree exactly).", "direct": False},
@@ -126,7 +126,7 @@ MODEL_LIBRARY = {
     "Muse Spark 1.2 Contributor": {"provider": "Meta",  "input": 0.10,  "output": 0.20,  "notes": "Low-cost Muse Spark 1.2 tier, Aug 2026. Via OpenRouter.", "direct": False},
     "Muse Spark 1.1":        {"provider": "Meta",       "input": 1.25,  "output": 4.25,  "notes": "Meta frontier tier, 1M context, Jul 2026. Cached input $0.15. Via OpenRouter.", "direct": False},
     "Muse Glimmer 30B":      {"provider": "Meta",       "input": 0.30,  "output": 1.20,  "notes": "Efficient Muse tier, Aug 2026. Via OpenRouter, single live host (DeepInfra), down from $0.35/$1.50.", "direct": False},
-    "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.1875, "output": 0.6525, "notes": "Open-weights 400B MoE (17B active). Via OpenRouter.", "direct": False},
+    "Llama 4 Maverick":      {"provider": "Meta",       "input": 0.35, "output": 1.00, "notes": "Open-weights 400B MoE (17B active). Via OpenRouter, repriced to median of 3 hosts (Parasail $0.35/$1.00, up from single-cheapest-host DigitalOcean $0.1875/$0.6525; Google ties on input at $0.35/$1.15).", "direct": False},
     "Llama 4 Scout":         {"provider": "Meta",       "input": 0.10,  "output": 0.3,   "notes": "Open-weights, efficient Llama 4 variant. Via OpenRouter.", "direct": False},
 }
 

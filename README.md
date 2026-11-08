@@ -21,7 +21,7 @@ How much does it *really* cost to run inference in production? This calculator c
   <img src="https://img.shields.io/badge/Models-117-blue" alt="117 models">
   <img src="https://img.shields.io/badge/GPU%20Instances-119-green" alt="119 GPU instances">
   <img src="https://img.shields.io/badge/GPU%20Providers-9-orange" alt="9 providers">
-  <img src="https://img.shields.io/badge/Pricing-November%201%2C%202026-red" alt="November 1, 2026 pricing">
+  <img src="https://img.shields.io/badge/Pricing-November%208%2C%202026-red" alt="November 8, 2026 pricing">
 </p>
 
 ## Inference Deployment Options Compared
@@ -72,7 +72,7 @@ pytest test_app.py -v
 3. **Self-Hosted GPU** — Pick a cloud provider and GPU instance from the dropdowns, or enter custom pricing
 4. **Local / Edge** — Configure on-premises hardware parameters
 5. **Comparison** — View side-by-side annual costs, per-million-token costs, and break-even analysis
-6. **Model Library** — Browse all 115 models with current pricing
+6. **Model Library** — Browse all 117 models with current pricing
 7. **GPU Library** — Browse all 119 GPU instances with per-hour pricing across providers
 
 ## Project Structure
@@ -80,7 +80,7 @@ pytest test_app.py -v
 | File | Description |
 |------|-------------|
 | `app.py` | UI, calculations, charts, event wiring |
-| `models.py` | API model library (115 models with per-token pricing) |
+| `models.py` | API model library (117 models with per-token pricing) |
 | `routers.py` | Router fees and generated per-model router availability |
 | `check_router_catalogs.py` | Refreshes router availability from the OpenRouter, Requesty and Opper catalogs |
 | `gpus.py` | GPU instance library (119 instances across 9 providers) |
@@ -97,7 +97,7 @@ openai.com, platform.claude.com, ai.google.dev, docs.x.ai, api-docs.deepseek.com
 ### GPU Instance Pricing
 aws.amazon.com, cloud.google.com, azure.microsoft.com, coreweave.com, crusoe.ai, lambda.ai, runpod.io, together.ai, vast.ai
 
-All pricing as of November 1, 2026. Pricing is refreshed automatically every Sunday by a scheduled agent that verifies each change against the provider's own pricing page. Contributions welcome to keep pricing current.
+All pricing as of November 8, 2026. Pricing is refreshed automatically every Sunday by a scheduled agent that verifies each change against the provider's own pricing page. Contributions welcome to keep pricing current.
 
 ## Contributing
 
